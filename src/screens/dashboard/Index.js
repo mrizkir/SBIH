@@ -2,7 +2,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIn
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios, { AxiosError } from 'axios'
-import { baseURL } from '../../constants/General'
+import { baseURL, DEFAULT_PENDIDIKAN_PPU } from '../../constants/General'
 import { formatNumber } from '../../constants/Helper'
 import { useQuery } from 'react-query'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -265,7 +265,10 @@ const Index = () => {
     }, { retry: 0, keepPreviousData: true, enabled: dataHLS.isSuccess })
 
     const dataPPU = useQuery('dataPPU', async () => {
-        const res = await axios.get(`${baseURL}/sosial/ppu`)
+        const requestBody = { "pendidikan": DEFAULT_PENDIDIKAN_PPU };
+        console.log('PPU Request Body:', JSON.stringify(requestBody));
+        const res = await axios.post(`${baseURL}/sosial/ppu`, requestBody)
+        console.log('PPU Response:', res?.data);
         setDataPersentasePendudukUsia(res?.data?.result)
         return res.data
     }, { retry: 0, keepPreviousData: true, enabled: dataJRTLH.isSuccess })

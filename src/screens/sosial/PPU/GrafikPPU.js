@@ -1,24 +1,153 @@
-import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native'
-import React from 'react'
+import { View, Text, Dimensions, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import React, { useMemo, useState, useEffect } from 'react'
 import { LineChart } from "react-native-chart-kit";
 import { stateDataPersentasePendudukUsia } from '../../../state/dataPPU';
 import { color } from '../../../constants/Helper';
 import Icon from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import { baseURL } from '../../../constants/General';
+import { useMutation } from 'react-query';
 
 const GrafikPPU = (props) => {
-  const {dataPersentasePendudukUsia} = stateDataPersentasePendudukUsia()
-  
-  const dataLaki = dataPersentasePendudukUsia.map(item => parseFloat(item.laki));
-  const dataPerempuan = dataPersentasePendudukUsia.map(item => parseFloat(item.perempuan));
-  const dataTotal = dataPersentasePendudukUsia.map(item => parseFloat(item.total));
+  const {dataPersentasePendudukUsia, setDataPersentasePendudukUsia} = stateDataPersentasePendudukUsia()
 
-  // Statistik
-  const avgLaki = (dataLaki.reduce((a, b) => a + b, 0) / dataLaki.length).toFixed(2);
-  const avgPerempuan = (dataPerempuan.reduce((a, b) => a + b, 0) / dataPerempuan.length).toFixed(2);
-  const avgTotal = (dataTotal.reduce((a, b) => a + b, 0) / dataTotal.length).toFixed(2);
+  const [expanded, setExpanded] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('4'); // Default: SMA/MA/SMK
+
+  // API call with POST method
+  const { mutate: fetchData, isLoading } = useMutation(
+    async () => {
+      const response = await axios.post(`${baseURL}/sosial/ppu`, {
+        pendidikan: selectedCategory
+      });
+      return response.data.result;
+    },
+    {
+      onError: (error) => {
+        console.error("Error fetching PPU data:", error);
+      },
+      onSuccess: (data) => {
+        setDataPersentasePendudukUsia(data);
+      }
+    }
+  );
+
+  // Fetch data on component mount and when category changes
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
+
+  // Sort data by year in ascending order for chart
+  const sortedData = useMemo(() => {
+    if (!dataPersentasePendudukUsia || dataPersentasePendudukUsia.length === 0) return [];
+    return [...dataPersentasePendudukUsia].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
+  }, [dataPersentasePendudukUsia]);
+
+  // Get latest 5 records for chart display
+  const chartData = useMemo(() => {
+    if (sortedData.length === 0) return { labels: [], laki: [], perempuan: [] };
+    
+    // Take last 5 records (latest years)
+    const latest5Records = sortedData.slice(-5);
+    
+    // Filter valid data
+    const validData = latest5Records.filter(item => {
+      const laki = parseFloat(item.laki);
+      const perempuan = parseFloat(item.perempuan);
+      return !isNaN(laki) && !isNaN(perempuan) && 
+             laki >= 0 && perempuan >= 0;
+    });
+    
+    const labels = validData.map(item => String(item.tahun));
+    const laki = validData.map(item => parseFloat(item.laki));
+    const perempuan = validData.map(item => parseFloat(item.perempuan));
+    
+    // Add dummy data (0 and 100) to force Y-axis range 0-100
+    // Use first and last labels to make dummy points overlap with real data points
+    const firstLabel = labels.length > 0 ? labels[0] : '';
+    const lastLabel = labels.length > 0 ? labels[labels.length - 1] : '';
+    
+    return {
+      labels: labels.length > 0 ? [firstLabel, ...labels, lastLabel] : labels,
+      laki: laki.length > 0 ? [0, ...laki, 100] : laki,
+      perempuan: perempuan.length > 0 ? [0, ...perempuan, 100] : perempuan
+    };
+  }, [sortedData]);
+
+  const chartLabels = chartData.labels;
+  const dataLaki = chartData.laki;
+  const dataPerempuan = chartData.perempuan;
+
+  // Statistik dari data chart (hanya laki-laki dan perempuan, tanpa total)
+  const avgLaki = dataLaki.length > 0 ? (dataLaki.reduce((a, b) => a + b, 0) / dataLaki.length).toFixed(2) : '0';
+  const avgPerempuan = dataPerempuan.length > 0 ? (dataPerempuan.reduce((a, b) => a + b, 0) / dataPerempuan.length).toFixed(2) : '0';
+  const maxLaki = dataLaki.length > 0 ? Math.max(...dataLaki) : 0;
+  const maxPerempuan = dataPerempuan.length > 0 ? Math.max(...dataPerempuan) : 0;
+  const minLaki = dataLaki.length > 0 ? Math.min(...dataLaki) : 0;
+  const minPerempuan = dataPerempuan.length > 0 ? Math.min(...dataPerempuan) : 0;
 
   // Gap Gender
-  const genderGap = Math.abs(avgLaki - avgPerempuan).toFixed(2);
+  const genderGap = Math.abs(parseFloat(avgLaki) - parseFloat(avgPerempuan)).toFixed(2);
+
+  // Fixed Y-Axis interval: 0, 10, 20, 30, ..., 100
+  const yAxisInterval = 10; // Fixed interval of 10
+  const yAxisSegments = 10; // 10 segments (0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+
+  const getCategoryColor = (categoryCode) => {
+    const colors = {
+      '1': '#e53935',
+      '2': '#f57c00',
+      '3': '#fbc02d',
+      '4': '#1976d2',
+      '5': '#1976d2',
+      '6': '#7b1fa2',
+      '7': '#c2185b',
+    };
+    return colors[String(categoryCode)] || '#1976d2';
+  };
+
+  const handleFilterChange = (categoryCode, title) => {
+    setSelectedCategory(categoryCode);
+    setExpanded(false);
+  };
+
+  const filterOptions = [
+    { code: '1', title: 'Tidak/belum tamat SD', subtitle: 'Pendidikan dasar belum selesai', icon: 'school-outline' },
+    { code: '2', title: 'SD/MI', subtitle: 'Sekolah Dasar / Madrasah Ibtidaiyah', icon: 'school' },
+    { code: '3', title: 'SMP/MTs', subtitle: 'Sekolah Menengah Pertama / Madrasah Tsanawiyah', icon: 'book' },
+    { code: '4', title: 'SMA/MA/SMK', subtitle: 'Sekolah Menengah Atas / Kejuruan', icon: 'library' },
+    { code: '5', title: 'D1/D2/D3', subtitle: 'Diploma 1, 2, atau 3', icon: 'document-text' },
+    { code: '6', title: 'D4/S1', subtitle: 'Diploma 4 / Sarjana', icon: 'ribbon' },
+    { code: '7', title: 'S2/S3', subtitle: 'Magister / Doktor', icon: 'trophy' },
+  ];
+
+  const selectedFilter = filterOptions.find(opt => opt.code === selectedCategory) || filterOptions.find(opt => opt.code === '4');
+
+  // Handle case when no data is available
+  if (!dataPersentasePendudukUsia || dataPersentasePendudukUsia.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <Icon name="analytics" size={32} color="#1976d2" />
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+              <View style={styles.sourceContainer}>
+                <Icon name="document-text-outline" size={16} color="#666" />
+                <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View style={styles.noDataContainer}>
+          <Icon name="alert-circle-outline" size={64} color="#ccc" />
+          <Text style={styles.noDataText}>Data tidak tersedia</Text>
+          <Text style={styles.noDataSubText}>Silakan refresh untuk memuat data</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -36,47 +165,107 @@ const GrafikPPU = (props) => {
         </View>
       </View>
 
+      {/* Loading Indicator */}
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1976d2" />
+          <Text style={styles.loadingText}>Memuat data...</Text>
+        </View>
+      )}
+
+      {/* Filter Accordion */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity 
+          style={styles.filterButton}
+          onPress={() => setExpanded(!expanded)}
+        >
+          <View style={styles.filterButtonContent}>
+            <Icon name="filter" size={20} color="#1976d2" />
+            <Text style={styles.filterButtonText}>
+              Filter: <Text style={styles.filterButtonValue}>{selectedFilter.title}</Text>
+            </Text>
+          </View>
+          <Icon 
+            name={expanded ? "chevron-up" : "chevron-down"} 
+            size={20} 
+            color="#1976d2" 
+          />
+        </TouchableOpacity>
+
+        {expanded && (
+          <ScrollView 
+            style={styles.filterOptions}
+            nestedScrollEnabled={true}
+            showsVerticalScrollIndicator={true}
+          >
+            {filterOptions.map((option, index) => {
+              const isSelected = option.code === selectedCategory;
+              const optionColor = option.code ? getCategoryColor(option.code) : '#1976d2';
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.filterOption,
+                    isSelected && styles.filterOptionSelected
+                  ]}
+                  onPress={() => handleFilterChange(option.code, option.title)}
+                >
+                  <Icon 
+                    name={option.icon} 
+                    size={24} 
+                    color={isSelected ? optionColor : '#666'} 
+                  />
+                  <View style={styles.filterOptionContent}>
+                    <Text style={[
+                      styles.filterOptionTitle,
+                      isSelected && { color: optionColor }
+                    ]}>
+                      {option.title}
+                    </Text>
+                    <Text style={styles.filterOptionSubtitle}>{option.subtitle}</Text>
+                  </View>
+                  {isSelected && (
+                    <Icon name="checkmark-circle" size={20} color={optionColor} />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        )}
+      </View>
+
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Gender Stats Summary */}
-        <View style={styles.genderSummary}>
-          <View style={styles.genderSummaryItem}>
-            <Icon name="male" size={24} color="#1e88e5" />
-            <View style={styles.genderSummaryContent}>
-              <Text style={styles.genderSummaryLabel}>Laki-laki</Text>
-              <Text style={[styles.genderSummaryValue, { color: '#1e88e5' }]}>
-                {avgLaki}%
-              </Text>
-              <Text style={styles.genderSummarySubtext}>Rata-rata</Text>
-            </View>
+        {/* Period Info */}
+        <View style={styles.periodCard}>
+          <Icon name="time-outline" size={24} color="#1976d2" />
+          <View style={styles.periodContent}>
+            <Text style={styles.periodText}>
+              Total Data: <Text style={styles.periodValue}>{sortedData.length} Record</Text>
+            </Text>
+            <Text style={styles.periodText}>
+              Chart Menampilkan: <Text style={styles.periodValue}>5 Record Terbaru</Text>
+            </Text>
+            <Text style={styles.periodText}>
+              Kategori: <Text style={styles.periodValue}>{selectedFilter.title}</Text>
+            </Text>
+          </View>
+        </View>
+
+        {/* Statistics Cards */}
+        <View style={styles.statsContainer}>
+          <View style={[styles.statCard, { backgroundColor: '#1e88e5' }]}>
+            <Icon name="male" size={24} color="#fff" />
+            <Text style={styles.statValue}>{maxLaki.toFixed(1)}%</Text>
+            <Text style={styles.statLabel}>Laki-laki Tertinggi</Text>
           </View>
 
-          <View style={styles.genderDivider} />
-
-          <View style={styles.genderSummaryItem}>
-            <Icon name="female" size={24} color="#e91e63" />
-            <View style={styles.genderSummaryContent}>
-              <Text style={styles.genderSummaryLabel}>Perempuan</Text>
-              <Text style={[styles.genderSummaryValue, { color: '#e91e63' }]}>
-                {avgPerempuan}%
-              </Text>
-              <Text style={styles.genderSummarySubtext}>Rata-rata</Text>
-            </View>
-          </View>
-
-          <View style={styles.genderDivider} />
-
-          <View style={styles.genderSummaryItem}>
-            <Icon name="people" size={24} color="#1976d2" />
-            <View style={styles.genderSummaryContent}>
-              <Text style={styles.genderSummaryLabel}>Total</Text>
-              <Text style={[styles.genderSummaryValue, { color: '#1976d2' }]}>
-                {avgTotal}%
-              </Text>
-              <Text style={styles.genderSummarySubtext}>Rata-rata</Text>
-            </View>
+          <View style={[styles.statCard, { backgroundColor: '#e91e63' }]}>
+            <Icon name="female" size={24} color="#fff" />
+            <Text style={styles.statValue}>{maxPerempuan.toFixed(1)}%</Text>
+            <Text style={styles.statLabel}>Perempuan Tertinggi</Text>
           </View>
         </View>
 
@@ -84,58 +273,79 @@ const GrafikPPU = (props) => {
         <View style={styles.chartCard}>
           <View style={styles.chartHeader}>
             <Icon name="bar-chart" size={24} color="#1976d2" />
-            <Text style={styles.chartTitle}>Perbandingan Gender per Pendidikan</Text>
+            <Text style={styles.chartTitle}>Grafik PPU - {selectedFilter.title}</Text>
           </View>
-          
+
           <View style={styles.chartWrapper}>
-            <LineChart
-              data={{
-                labels: dataPersentasePendudukUsia.map(item => item.pendidikan),
-                datasets: [
-                  {
-                    data: dataLaki,
-                    color: (opacity = 1) => `rgba(30, 136, 229, ${opacity})`,
-                    strokeWidth: 3
+            {chartLabels.length > 0 && dataLaki.length > 0 ? (
+              <LineChart
+                key={`chart-${selectedCategory}-${dataPersentasePendudukUsia.length}`}
+                data={{
+                  labels: chartLabels,
+                  datasets: [
+                    {
+                      data: dataLaki,
+                      color: (opacity = 1) => `rgba(30, 136, 229, ${opacity})`,
+                      strokeWidth: 3
+                    },
+                    {
+                      data: dataPerempuan,
+                      color: (opacity = 1) => `rgba(233, 30, 99, ${opacity})`,
+                      strokeWidth: 3
+                    }
+                  ],
+                  legend: ["Laki-laki", "Perempuan"]
+                }}
+                width={Dimensions.get("window").width - 48}
+                height={280}
+                yAxisSuffix="%"
+                yAxisInterval={yAxisInterval}
+                fromZero={true}
+                segments={yAxisSegments}
+                formatYLabel={(value) => {
+                  const num = parseFloat(value);
+                  return num.toFixed(0);
+                }}
+                chartConfig={{
+                  backgroundColor: "#1976d2",
+                  backgroundGradientFrom: "#1976d2",
+                  backgroundGradientTo: "#1565c0",
+                  decimalPlaces: 1,
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
                   },
-                  {
-                    data: dataPerempuan,
-                    color: (opacity = 1) => `rgba(233, 30, 99, ${opacity})`,
-                    strokeWidth: 3
-                  }
-                ],
-                legend: ["Laki-laki", "Perempuan"]
-              }}
-              width={Dimensions.get("window").width - 48}
-              height={280}
-              yAxisSuffix="%"
-              yAxisInterval={1}
-              fromZero={true}
-              chartConfig={{
-                backgroundColor: "#1976d2",
-                backgroundGradientFrom: "#1976d2",
-                backgroundGradientTo: "#1565c0",
-                decimalPlaces: 1,
-                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForLabels: {
-                  fontSize: 10,
-                  fontWeight: '600'
-                },
-                propsForDots: {
-                  r: "5",
-                  strokeWidth: "2",
-                },
-                propsForBackgroundLines: {
-                  strokeDasharray: "5,5",
-                  stroke: "rgba(255,255,255,0.2)"
-                },
-              }}
-              bezier
-              style={styles.chart}
-            />
+                  propsForLabels: {
+                    fontSize: 10,
+                    fontWeight: '600'
+                  },
+                  propsForDots: {
+                    r: "5",
+                    strokeWidth: "2",
+                  },
+                  propsForBackgroundLines: {
+                    strokeDasharray: "5,5",
+                    stroke: "rgba(255,255,255,0.2)"
+                  },
+                }}
+                bezier
+                style={styles.chart}
+              />
+            ) : (
+              <View style={styles.noChartContainer}>
+                <Icon name="bar-chart-outline" size={48} color="#ccc" />
+                <Text style={styles.noChartText}>Data tidak cukup untuk menampilkan grafik</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Y-Axis Info */}
+          <View style={styles.axisInfo}>
+            <View style={styles.axisRow}>
+              <Icon name="resize-outline" size={16} color="#666" />
+              <Text style={styles.axisText}>Sumbu X: Tahun | Sumbu Y: Persentase (%)</Text>
+            </View>
           </View>
 
           {/* Custom Legend */}
@@ -147,6 +357,18 @@ const GrafikPPU = (props) => {
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#e91e63' }]} />
               <Text style={styles.legendText}>Perempuan</Text>
+            </View>
+          </View>
+
+          {/* Average Values */}
+          <View style={styles.averageContainer}>
+            <View style={styles.averageItem}>
+              <Text style={styles.averageLabel}>Rata-rata Laki-laki:</Text>
+              <Text style={[styles.averageValue, { color: '#1e88e5' }]}>{avgLaki}%</Text>
+            </View>
+            <View style={styles.averageItem}>
+              <Text style={styles.averageLabel}>Rata-rata Perempuan:</Text>
+              <Text style={[styles.averageValue, { color: '#e91e63' }]}>{avgPerempuan}%</Text>
             </View>
           </View>
         </View>
@@ -178,7 +400,11 @@ const GrafikPPU = (props) => {
           <View style={styles.infoContent}>
             <View style={styles.infoRow}>
               <View style={styles.infoDot} />
-              <Text style={styles.infoText}>Perbandingan persentase berdasarkan tingkat pendidikan</Text>
+              <Text style={styles.infoText}>Menampilkan tren PPU 5 tahun terbaru untuk kategori {selectedFilter.title}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <View style={styles.infoDot} />
+              <Text style={styles.infoText}>Sumbu X: Tahun | Sumbu Y: Persentase (%)</Text>
             </View>
             <View style={styles.infoRow}>
               <View style={styles.infoDot} />
@@ -186,11 +412,11 @@ const GrafikPPU = (props) => {
             </View>
             <View style={styles.infoRow}>
               <View style={styles.infoDot} />
-              <Text style={styles.infoText}>Total {dataPersentasePendudukUsia.length} kategori pendidikan</Text>
+              <Text style={styles.infoText}>PPU = Persentase Penduduk Usia (dalam %)</Text>
             </View>
             <View style={styles.infoRow}>
               <View style={styles.infoDot} />
-              <Text style={styles.infoText}>PPU = Persentase Penduduk Usia (dalam %)</Text>
+              <Text style={styles.infoText}>Total data: {sortedData.length} Record | Chart: 5 Record Terbaru</Text>
             </View>
           </View>
         </View>
@@ -245,47 +471,133 @@ const styles = StyleSheet.create({
     color: '#e53935',
     fontWeight: '600',
   },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  genderSummary: {
+  loadingContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#E3F2FD',
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 8,
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#1976d2',
+    fontWeight: '500',
+  },
+  filterContainer: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 12,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
-  genderSummaryItem: {
-    flex: 1,
+  filterButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    padding: 16,
   },
-  genderSummaryContent: {
+  filterButtonContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    gap: 12,
   },
-  genderSummaryLabel: {
-    fontSize: 12,
+  filterButtonText: {
+    fontSize: 16,
     color: '#666',
-    marginBottom: 4,
   },
-  genderSummaryValue: {
-    fontSize: 24,
+  filterButtonValue: {
     fontWeight: 'bold',
+    color: '#1976d2',
+  },
+  filterOptions: {
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    maxHeight: 400,
+  },
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  filterOptionSelected: {
+    backgroundColor: '#f5f5f5',
+  },
+  filterOptionContent: {
+    flex: 1,
+  },
+  filterOptionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
     marginBottom: 2,
   },
-  genderSummarySubtext: {
-    fontSize: 10,
+  filterOptionSubtitle: {
+    fontSize: 12,
     color: '#999',
   },
-  genderDivider: {
-    width: 1,
-    backgroundColor: '#e0e0e0',
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 30,
+  },
+  periodCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E3F2FD',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    gap: 12,
+  },
+  periodContent: {
+    flex: 1,
+    gap: 4,
+  },
+  periodText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  periodValue: {
+    fontWeight: 'bold',
+    color: '#1976d2',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 8,
   },
   chartCard: {
     backgroundColor: '#fff',
@@ -316,13 +628,31 @@ const styles = StyleSheet.create({
   chart: {
     borderRadius: 16,
   },
+  axisInfo: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    marginBottom: 12,
+  },
+  axisRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  axisText: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '500',
+  },
   legendContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 24,
     paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    marginBottom: 12,
+    paddingBottom: 12,
   },
   legendItem: {
     flexDirection: 'row',
@@ -338,6 +668,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     fontWeight: '500',
+  },
+  averageContainer: {
+    gap: 8,
+    paddingTop: 12,
+  },
+  averageItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  averageLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  averageValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   gapCard: {
     backgroundColor: '#fff',
@@ -414,5 +761,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     flex: 1,
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#666',
+    marginTop: 16,
+    fontWeight: '600',
+  },
+  noDataSubText: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  noChartContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    minHeight: 280,
+  },
+  noChartText: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
 })

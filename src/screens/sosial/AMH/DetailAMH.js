@@ -71,8 +71,10 @@ const DetailAMH = (props) => {
   }, [dataAngkaMelekHuruf]);
 
   const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
+    if (!status || typeof status !== 'string') return '#666';
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('tetap')) return '#43a047';
+    if (statusLower.includes('sementara')) return '#fb8c00';
     return '#666';
   };
 
