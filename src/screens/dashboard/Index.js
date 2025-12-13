@@ -265,10 +265,8 @@ const Index = () => {
     }, { retry: 0, keepPreviousData: true, enabled: dataHLS.isSuccess })
 
     const dataPPU = useQuery('dataPPU', async () => {
-        const requestBody = { "pendidikan": DEFAULT_PENDIDIKAN_PPU };
-        console.log('PPU Request Body:', JSON.stringify(requestBody));
-        const res = await axios.post(`${baseURL}/sosial/ppu`, requestBody)
-        console.log('PPU Response:', res?.data);
+        const requestBody = { "pendidikan": DEFAULT_PENDIDIKAN_PPU };        
+        const res = await axios.post(`${baseURL}/sosial/ppu`, requestBody)        
         setDataPersentasePendudukUsia(res?.data?.result)
         return res.data
     }, { retry: 0, keepPreviousData: true, enabled: dataJRTLH.isSuccess })

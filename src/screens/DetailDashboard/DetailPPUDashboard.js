@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPPU from '../sosial/PPU/DetailPPU'
 import GrafikPPU from '../sosial/PPU/GrafikPPU'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -17,6 +18,7 @@ const DetailPPUDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

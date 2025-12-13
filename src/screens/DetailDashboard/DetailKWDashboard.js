@@ -3,12 +3,11 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailKW from '../ekonomi/KW/DetailKW';
 import GrafikKW from '../ekonomi/KW/GrafikKW';
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
 const DetailKWDashboard = (props) => {
-  // console.log("propsi", props);
-  
   return (
     <Tab.Navigator
     screenOptions={{
@@ -18,6 +17,7 @@ const DetailKWDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
         <Tab.Screen 

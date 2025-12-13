@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailJRTLH from '../sosial/JRTLH/DetailJRTLH'
 import GrafikJRTLH from '../sosial/JRTLH/GrafikJRTLH'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -17,6 +18,7 @@ const DetailJRTLHDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

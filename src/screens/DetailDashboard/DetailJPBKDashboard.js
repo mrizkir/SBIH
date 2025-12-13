@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailJPBK from '../kependudukan/JPBK/DetailJPBK'
 import GrafikJPBK from '../kependudukan/JPBK/GrafikJPBK'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -17,6 +18,7 @@ const DetailJPBKDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

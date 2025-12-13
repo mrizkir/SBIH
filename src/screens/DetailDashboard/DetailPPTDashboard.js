@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPPT from '../pertanian/PPT/DetailPPT'
 import GrafikPPT from '../pertanian/PPT/GrafikPPT'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -17,6 +18,7 @@ const DetailPPTDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

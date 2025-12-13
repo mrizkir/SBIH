@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPPB from '../pertanian/PPB/DetailPPB'
 import GrafikPPB from '../pertanian/PPB/GrafikPPB'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -17,6 +18,7 @@ const DetailPPBDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

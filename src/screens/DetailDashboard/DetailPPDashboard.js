@@ -3,12 +3,11 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPP from '../kependudukan/PP/DetailPP'
 import GrafikPP from '../kependudukan/PP/GrafikPP'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
 const DetailPPDashboard = (props) => {
-  // console.log("propsi", props);
-  
   return (
     <Tab.Navigator
     screenOptions={{
@@ -18,6 +17,7 @@ const DetailPPDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
         <Tab.Screen 

@@ -3,11 +3,11 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailIDB from '../sosial/IDB/DetailIDB'
 import GrafikIDB from '../sosial/IDB/GrafikIDB'
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
 const DetailDashboard = (props) => {
-  // console.log("propsi", props);
   
   return (
     <Tab.Navigator
@@ -18,6 +18,7 @@ const DetailDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
         <Tab.Screen 

@@ -3,12 +3,11 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPRT from '../infrastruktur/prt/DetailPRT';
 import GrafikPRT from '../infrastruktur/prt/GrafikPRT';
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator()
 
 const DetailPRTDashboard = (props) => {
-  // console.log("propsi", props);
-  
   return (
     <Tab.Navigator
     screenOptions={{
@@ -18,6 +17,7 @@ const DetailPRTDashboard = (props) => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
         <Tab.Screen 

@@ -4,6 +4,7 @@ import { useMutation } from 'react-query';
 
 import DetailADHK from '../ekonomi/ADHK/DetailADHK';
 import GrafikADHK from '../ekonomi/ADHK/GrafikADHK';
+import { safeTabBarButton } from '../../components/SafeTabBarButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,6 +18,7 @@ const DetailADHKDashboard = () => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

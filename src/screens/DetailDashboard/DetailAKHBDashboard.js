@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailAKHB from '../sosial/AKHB/DetailAKHB';
 import GrafikAKHB from '../sosial/AKHB/GrafikAKHB';
+import { safeTabBarButton } from '../../components/SafeTabBarButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -16,6 +17,7 @@ const DetailAKHBDashboard = () => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

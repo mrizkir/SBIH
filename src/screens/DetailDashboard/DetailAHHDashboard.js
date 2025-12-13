@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailAHH from '../sosial/AHH/DetailAHH';
 import GrafikAHH from '../sosial/AHH/GrafikAHH';
+import { safeTabBarButton } from '../../components/SafeTabBarButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -16,6 +17,7 @@ const DetailAHHDashboard = () => {
           fontSize: 14,
           fontWeight: '700',
         },
+        tabBarButton: safeTabBarButton,
       }}
     >
       <Tab.Screen

@@ -46,8 +46,7 @@ const DetailVideoDashboard = () => {
 
     // Test the splitLinkVideo function with sample URLs
     dataVideo.forEach((item, index) => {
-        const videoId = splitLinkVideo(item.link);
-        console.log(`Video ${index + 1} - Title: ${item.judul}, Link: ${item.link}, Extracted ID: ${videoId}`);
+        const videoId = splitLinkVideo(item.link);        
     });
     
 

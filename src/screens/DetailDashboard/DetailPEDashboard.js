@@ -4,6 +4,7 @@ import { View, Text } from 'react-native';
 
 import DetailPE from '../ekonomi/PE/DetailPE';
 import GrafikPE from '../ekonomi/PE/GrafikPE';
+import { safeTabBarButton } from '../../components/SafeTabBarButton'
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -19,6 +20,7 @@ const DetailPEDashboard = () => {
             fontSize: 14,
             fontWeight: '700',
           },
+          tabBarButton: safeTabBarButton,
         }}
       >
         <Tab.Screen 

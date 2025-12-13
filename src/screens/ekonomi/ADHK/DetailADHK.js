@@ -50,8 +50,7 @@ const DetailADHK = (props) => {
   
   // Filter dan sort data dari tahun terbaru ke terlama
   const dataRender = dataAtasDasarHargaKonstan
-    ?.filter(item => {
-      console.log('Filtering item:', item, 'selectedCategoryId:', selectedCategoryId, 'Match:', item.id === selectedCategoryId);
+    ?.filter(item => {      
       return item.id === selectedCategoryId;
     })
     ?.sort((a, b) => {
@@ -112,7 +111,6 @@ const DetailADHK = (props) => {
       <View style={styles.filterSection}>
         <CategoryADHK
           onCategorySelect={(id) => {
-            console.log('Category selected:', id);
             setSelectedCategoryId(id);
           }}
         />
