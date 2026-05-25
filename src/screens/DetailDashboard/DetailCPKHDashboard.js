@@ -22,14 +22,14 @@ const DetailCPKHDashboard = (props) => {
       }}
     >
       <Tab.Screen
-        name="Detail Capaian Produksi Komoditi Hortikultura (CPKH) "
+        name="Detail Capaian Produksi Komoditi Hortikultura "
         component={DetailCPKH}
-        initialParams={{ title: "Data Capaian Produksi Komoditi Hortikultura (Ton/ha)" }}
+        initialParams={{ title: "Data Produktivitas Komoditas Hortikultura (Ton/ha)" }}
       />
       <Tab.Screen
-        name="Grafik Capaian Produksi Komoditi Hortikultura (CPKH) "
+        name="Grafik Produktivitas Komoditas Hortikultura"
         component={GrafikCPKH}
-        initialParams={{ title: "Data Capaian Produksi Komoditi Hortikultura (Ton/ha)" }}
+        initialParams={{ title: "Data Produktivitas KomoditiasHortikultura (Ton/ha)" }}
       />
     </Tab.Navigator>
   )

@@ -138,7 +138,7 @@ const GrafikAHH = (props) => {
               <Icon name="calendar-outline" size={20} color="#666" />
               <View style={styles.currentValueWrapper}>
                 <Text style={styles.currentValueText}>
-                  Produksi Terkini: <Text style={[styles.currentValue, { color: currentCategory.color }]}>{formatNumber(latestValue)} Ton</Text>
+                  Produksi Terkini: <Text style={[styles.currentValue, { color: currentCategory.color }]}>{formatNumber(latestValue)} Ton/ha</Text>
                 </Text>
                 <View style={[styles.categoryBadge, { backgroundColor: currentCategory.color + '20' }]}>
                   <Text style={[styles.categoryText, { color: currentCategory.color }]}>
@@ -164,7 +164,7 @@ const GrafikAHH = (props) => {
               </View>
               <View style={styles.infoRow}>
                 <View style={styles.infoDot} />
-                <Text style={styles.infoText}>Jumlah produksi dalam satuan ton</Text>
+                <Text style={styles.infoText}>Jumlah produksi dalam satuan ton/ha</Text>
               </View>
               <View style={styles.infoRow}>
                 <View style={styles.infoDot} />
@@ -184,19 +184,19 @@ const GrafikAHH = (props) => {
           <View style={styles.legendContent}>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#43a047' }]} />
-              <Text style={styles.legendText}>Sangat Tinggi (≥10K ton)</Text>
+              <Text style={styles.legendText}>Sangat Tinggi (≥10K ton/ha)</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#1e88e5' }]} />
-              <Text style={styles.legendText}>Tinggi (5K-9.9K ton)</Text>
+              <Text style={styles.legendText}>Tinggi (5K-9.9K ton/ha)</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#fb8c00' }]} />
-              <Text style={styles.legendText}>Sedang (1K-4.9K ton)</Text>
+              <Text style={styles.legendText}>Sedang (1K-4.9K ton/ha)</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#e53935' }]} />
-              <Text style={styles.legendText}>Rendah (&lt;1K ton)</Text>
+              <Text style={styles.legendText}>Rendah (&lt;1K ton/ha)</Text>
             </View>
           </View>
         </View>

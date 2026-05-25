@@ -22,14 +22,14 @@ const DetailCPKUPDashboard = (props) => {
       }}
     >
       <Tab.Screen
-        name="Detail Capaian Produksi Komoditi Unggulan Perkebunan (CPKUP)"
+        name="Detail Produktivitas Komoditas Unggulan Perkebunan"
         component={DetailCPKUP}
-        initialParams={{ title: "Data Capaian Produksi Komoditi Unggulan Perkebunan (CPKUP)" }}
+        initialParams={{ title: "Data Produktivitas Komoditas Unggulan Perkebunan (Ton/ha)" }}
       />
       <Tab.Screen
-        name="Grafik Capaian Produksi Komoditi Unggulan Perkebunan (CPKUP)"
+        name="Grafik Produktivitas Komoditas Unggulan Perkebunan"
         component={GrafikCPKUP}
-        initialParams={{ title: "Data Capaian Produksi Komoditi Unggulan Perkebunan (CPKUP)" }}
+        initialParams={{ title: "Data Produktivitas Komoditas Unggulan Perkebunan (Ton/ha)" }}
       />
     </Tab.Navigator>
   )
