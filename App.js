@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack'
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import Dashboard from './src/screens/dashboard/Index'
 import TentangKami from './src/screens/dashboard/TentangKami.js';
@@ -78,6 +79,7 @@ const DashboardDrawer = () => {
 
 const App = () => {
   return (
+    <SafeAreaProvider>
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Stack.Navigator>
@@ -284,6 +286,7 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
+    </SafeAreaProvider>
   )
 }
 

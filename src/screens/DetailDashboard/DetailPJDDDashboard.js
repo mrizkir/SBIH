@@ -3,22 +3,13 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPJDD from '../infrastruktur/pjdd/DetailPJDD'
 import GrafikPJDD from '../infrastruktur/pjdd/GrafikPJDD'
-import { safeTabBarButton } from '../../components/SafeTabBarButton'
-
+import { materialTopTabScreenOptions } from '../../components/SafeTabBarButton'
 const Tab = createMaterialTopTabNavigator()
 
 const DetailPJDDDashboard = (props) => {
   return (
     <Tab.Navigator
-    screenOptions={{
-        tabBarActiveTintColor: '#0074BD',
-        tabBarInactiveTintColor: '#979797',
-        tabBarLabelStyle: {
-          fontSize: 14,
-          fontWeight: '700',
-        },
-        tabBarButton: safeTabBarButton,
-      }}
+    screenOptions={materialTopTabScreenOptions}
     >
         <Tab.Screen 
         name="Detail Panjang Jalan yang Dibangun dan Ditingkatkan" 

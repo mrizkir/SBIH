@@ -44,6 +44,7 @@ const DrawerContent = () => {
                     }}>
                     <List.Item titleNumberOfLines={2} title="% Penduduk Miskin" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailDashboard')} />
                     <List.Item titleNumberOfLines={2} title="Index Pembangunan Manusia" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailIPMDashboard')} />
+                    <List.Item titleNumberOfLines={2} title="Prevalensi Stunting" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailPSDashboard')} />
                     <List.Item titleNumberOfLines={2} title="Angka Rata-Rata Lama Sekolah" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailRLSDashboard')} />
                     <List.Item titleNumberOfLines={2} title="Angka Melek Huruf" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAMHDashboard')} />
                     <List.Item titleNumberOfLines={2} title="Angka Harapan Hidup" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAHHDashboard')} />

@@ -3,23 +3,14 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailCPKH from '../pertanian/CPKH/DetailCPKH'
 import GrafikCPKH from '../pertanian/CPKH/GrafikCPKH'
-import { safeTabBarButton } from '../../components/SafeTabBarButton'
-
+import { materialTopTabScreenOptions } from '../../components/SafeTabBarButton'
 const Tab = createMaterialTopTabNavigator()
 
 const DetailCPKHDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#0074BD',
-        tabBarInactiveTintColor: '#979797',
-        tabBarLabelStyle: {
-          fontSize: 14,
-          fontWeight: '700',
-        },
-        tabBarButton: safeTabBarButton,
-      }}
+      screenOptions={materialTopTabScreenOptions}
     >
       <Tab.Screen
         name="Detail Capaian Produksi Komoditi Hortikultura "

@@ -1,25 +1,24 @@
 import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { LineChart } from "react-native-chart-kit";
-import { color, dataPS } from '../../../constants/Helper';
+import { color } from '../../../constants/Helper';
+import { stateDataPS } from '../../../state/dataPS';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const GrafikPS = (props) => {
-  
-  // Ambil 5 tahun terakhir
-  const last5Years = dataPS.slice(-5);
-  
-  // Hitung statistik dari 5 tahun terakhir
-  const values = last5Years.map(item => parseFloat(item.PS));
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
-  const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
-  const latestValue = values[values.length - 1];
+  const { dataPS } = stateDataPS()
 
-  // Tentukan range untuk sumbu Y (0 sampai max + buffer)
+  const sortedAllData = [...(dataPS || [])].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
+  const last5Years = sortedAllData.slice(-5);
+
+  const values = last5Years.map(item => parseFloat(item.prevalensi));
+  const maxValue = values.length > 0 ? Math.max(...values) : 0;
+  const minValue = values.length > 0 ? Math.min(...values) : 0;
+  const avgValue = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : '0';
+  const latestValue = values.length > 0 ? values[values.length - 1] : 0;
+
   const yAxisMax = Math.ceil(maxValue) + 2;
 
-  // Kategori Stunting
   const getStuntingCategory = (ps) => {
     const value = parseFloat(ps);
     if (value < 10) return { label: 'Sangat Rendah', color: '#43a047' };
@@ -29,6 +28,30 @@ const GrafikPS = (props) => {
   };
 
   const currentCategory = getStuntingCategory(latestValue);
+
+  if (!dataPS || dataPS.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <Icon name="analytics" size={32} color="#fb8c00" />
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+              <View style={styles.sourceContainer}>
+                <Icon name="document-text-outline" size={16} color="#666" />
+                <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View style={styles.noDataContainer}>
+          <Icon name="alert-circle-outline" size={64} color="#ccc" />
+          <Text style={styles.noDataText}>Data tidak tersedia</Text>
+          <Text style={styles.noDataSubText}>Silakan refresh untuk memuat data</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -443,5 +466,23 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 14,
     color: '#555',
+  },
+  noDataContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+  },
+  noDataText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#999',
+    marginTop: 16,
+  },
+  noDataSubText: {
+    fontSize: 14,
+    color: '#bbb',
+    marginTop: 8,
+    textAlign: 'center',
   },
 })

@@ -12,7 +12,7 @@ import GrafikFisikAPBPPPerubahan from './screens/GrafikFisikAPBPPPerubahan';
 import { useMutation } from 'react-query';
 import { stateDataAnggaran } from '../../state/dataAnggaran';
 import { stateDataTahun } from '../../state/dataTahun';
-import { safeTabBarButton } from '../../components/SafeTabBarButton';
+import { materialTopTabScreenOptions } from '../../components/SafeTabBarButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -153,14 +153,8 @@ const DashboardAnggaranMurni = ({ navigation }) => {
             
             <Tab.Navigator
                 screenOptions={{
-                    tabBarActiveTintColor: '#0074BD',
-                    tabBarInactiveTintColor: '#979797',
-                    tabBarLabelStyle: {
-                        fontSize: 14,
-                        fontWeight: '700',
-                    },
+                    ...materialTopTabScreenOptions,
                     tabBarScrollEnabled: true,
-                    tabBarButton: safeTabBarButton,
                 }}
             >
                 <Tab.Screen

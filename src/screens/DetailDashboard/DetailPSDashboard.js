@@ -3,23 +3,14 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPS from '../sosial/PS/DetailPS'
 import GrafikPS from '../sosial/PS/GrafikPS'
-import { safeTabBarButton } from '../../components/SafeTabBarButton'
-
+import { materialTopTabScreenOptions } from '../../components/SafeTabBarButton'
 const Tab = createMaterialTopTabNavigator()
 
 const DetailPSDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#0074BD',
-        tabBarInactiveTintColor: '#979797',
-        tabBarLabelStyle: {
-          fontSize: 14,
-          fontWeight: '700',
-        },
-        tabBarButton: safeTabBarButton,
-      }}
+      screenOptions={materialTopTabScreenOptions}
     >
       <Tab.Screen
         name="Detail Privalensi Stunting "

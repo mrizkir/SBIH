@@ -40,19 +40,3 @@ export const formatNumberWithDecimals = (num, decimals = 2) => {
     const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return `${integerPart},${parts[1]}`;
 };
-
-export const dataPS = [
-    {
-        id: 1,
-        tahun: 2023,
-        PS: 3.49,
-        status_data: "Data Sementara"
-    },
-    {
-        id: 2,
-        tahun: 2022,
-        PS: 3.41,
-        status_data: "Data Sementara"
-    }
-
-]

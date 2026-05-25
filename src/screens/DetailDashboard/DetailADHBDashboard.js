@@ -4,22 +4,14 @@ import { useMutation } from 'react-query';
 
 import DetailADHB from '../ekonomi/ADHB/DetailADHB';
 import GrafikADHB from '../ekonomi/ADHB/GrafikADHB';
-import { safeTabBarButton } from '../../components/SafeTabBarButton';
+import { materialTopTabScreenOptions } from '../../components/SafeTabBarButton';
 
 const Tab = createMaterialTopTabNavigator();
 
 const DetailADHBDashboard = () => {
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#0074BD',
-        tabBarInactiveTintColor: '#979797',
-        tabBarLabelStyle: {
-          fontSize: 14,
-          fontWeight: '700',
-        },
-        tabBarButton: safeTabBarButton,
-      }}
+      screenOptions={materialTopTabScreenOptions}
     >
       <Tab.Screen
         name="Detail Atas Dasar Harga Berlaku"

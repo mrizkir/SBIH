@@ -3,22 +3,13 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import DetailPP from '../kependudukan/PP/DetailPP'
 import GrafikPP from '../kependudukan/PP/GrafikPP'
-import { safeTabBarButton } from '../../components/SafeTabBarButton'
-
+import { materialTopTabScreenOptions } from '../../components/SafeTabBarButton'
 const Tab = createMaterialTopTabNavigator()
 
 const DetailPPDashboard = (props) => {
   return (
     <Tab.Navigator
-    screenOptions={{
-        tabBarActiveTintColor: '#0074BD',
-        tabBarInactiveTintColor: '#979797',
-        tabBarLabelStyle: {
-          fontSize: 14,
-          fontWeight: '700',
-        },
-        tabBarButton: safeTabBarButton,
-      }}
+    screenOptions={materialTopTabScreenOptions}
     >
         <Tab.Screen 
         name="Detail Pertumbuhan Penduduk" 

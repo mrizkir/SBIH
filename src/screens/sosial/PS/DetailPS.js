@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
-import { color, dataPS } from '../../../constants/Helper'
+import { color } from '../../../constants/Helper'
+import { stateDataPS } from '../../../state/dataPS'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -37,6 +38,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 };
 
 const DetailPS = (props) => {
+  const { dataPS } = stateDataPS()
 
   const getStatusColor = (status) => {
     if (status.toLowerCase().includes('tetap')) return '#43a047';
@@ -81,7 +83,7 @@ const DetailPS = (props) => {
         </View>
 
         {sortedData.map((item, index) => {
-          const category = getStuntingCategory(item.PS);
+          const category = getStuntingCategory(item.prevalensi);
           return (
             <AnimatedCard key={index} delay={index * 50}>
               <View style={styles.dataCard}>
@@ -103,7 +105,7 @@ const DetailPS = (props) => {
                     <Icon name="body" size={24} color={category.color} />
                     <View>
                       <Text style={[styles.percentageValue, { color: category.color }]}>
-                        {item.PS}%
+                        {item.prevalensi}%
                       </Text>
                       <Text style={styles.percentageLabel}>Prevalensi Stunting</Text>
                     </View>

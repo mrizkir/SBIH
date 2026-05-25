@@ -28,6 +28,7 @@ import { stateDataAngkaHarapanLamaSekolah } from '../../state/dataHLS'
 import { stateDataJumlahRumahTidakLayakHuni } from '../../state/dataJRTLH'
 import { stateDataPersentasePendudukUsia } from '../../state/dataPPU'
 import { stateDataIndeksPemberdayaanGender } from '../../state/dataIPGG'
+import { stateDataPS } from '../../state/dataPS'
 import { stateDataLajuInflasi } from '../../state/dataLI'
 import { stateDataAtasDasarHargaBerlaku } from '../../state/dataADHB'
 import { stateDataPMA } from '../../state/dataPMA'
@@ -108,6 +109,7 @@ const Index = () => {
     const { setDataJumlahRumahTidakLayakHuni } = stateDataJumlahRumahTidakLayakHuni()
     const { setDataPersentasePendudukUsia } = stateDataPersentasePendudukUsia()
     const { setDataIndeksPemberdayaanGender } = stateDataIndeksPemberdayaanGender()
+    const { setDataPS } = stateDataPS()
     const { setDataLajuInflasi } = stateDataLajuInflasi()
     const { setDataAtasDasarHargaBerlaku } = stateDataAtasDasarHargaBerlaku()
     const { setDataPMA } = stateDataPMA()
@@ -277,11 +279,17 @@ const Index = () => {
         return res.data
     }, { retry: 0, keepPreviousData: true, enabled: dataPPU.isSuccess })
 
+    const dataPS = useQuery('dataPS', async () => {
+        const res = await axios.get(`${baseURL}/sosial/stunting`)
+        setDataPS(res?.data?.result)
+        return res.data
+    }, { retry: 0, keepPreviousData: true, enabled: dataIPGG.isSuccess })
+
     const dataPMA = useQuery('dataPMA', async () => {
         const res = await axios.get(`${baseURL}/ekonomi/pma`)
         setDataPMA(res?.data?.result)
         return res.data
-    }, { retry: 0, keepPreviousData: true, enabled: dataIPGG.isSuccess })
+    }, { retry: 0, keepPreviousData: true, enabled: dataPS.isSuccess })
 
     const dataPPB = useQuery('dataPPB', async () => {
         const res = await axios.get(`${baseURL}/pertanian/ppb`)
@@ -364,6 +372,7 @@ const Index = () => {
             dataJRTLH.refetch(),
             dataPPU.refetch(),
             dataIPGG.refetch(),
+            dataPS.refetch(),
             dataPMA.refetch(),
             dataPPB.refetch(),
             dataPPT.refetch(),
@@ -410,9 +419,9 @@ const Index = () => {
             icon: privalensiStunting,
             iconName: 'fitness',
             color: '#fb8c00',
-            data: { isFetched: true, isLoading: false },
-            getValue: () => '3.49 %',
-            year: '2023',
+            data: dataPS,
+            getValue: () => dataPS?.data?.last_data?.[0]?.prevalensi ? `${dataPS.data.last_data[0].prevalensi} %` : '0 %',
+            year: dataPS?.data?.last_data?.[0]?.tahun,
             route: 'DetailPSDashboard',
         },
         {
