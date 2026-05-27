@@ -6,15 +6,9 @@ import Icon2 from 'react-native-vector-icons/AntDesign'
 import { useNavigation, useNavigationState, DrawerActions } from '@react-navigation/native';
 
 import LogoBintan from '../assets/bintan.png'
+import { MAIN_STACK_ROUTE, getActiveStackRouteName } from '../navigation/navigationRef';
 
-const HOME_ROUTES = ['Dashboard', 'Smart Bintan in Hand'];
-
-const getActiveRouteName = (state) => {
-  if (!state) return '';
-  const route = state.routes[state.index];
-  if (route.state) return getActiveRouteName(route.state);
-  return route.name;
-};
+const HOME_ROUTES = ['Dashboard'];
 
 const MENU_CATEGORIES = [
   {
@@ -136,7 +130,7 @@ const NavRow = ({ active, onPress, children }) => (
   </TouchableOpacity>
 );
 
-const MenuListItem = ({ item, activeRoute, navigation }) => {
+const MenuListItem = ({ item, activeRoute, onNavigate }) => {
   const isActive = activeRoute === item.route;
   return (
     <List.Item
@@ -145,15 +139,20 @@ const MenuListItem = ({ item, activeRoute, navigation }) => {
       title={item.title}
       style={isActive ? styles.menuItemActive : undefined}
       titleStyle={[styles.menuItemTitle, isActive && styles.menuItemTitleActive]}
-      onPress={() => navigation.navigate(item.route)}
+      onPress={() => onNavigate(item.route)}
     />
   );
 };
 
 const DrawerContent = () => {
   const navigation = useNavigation();
-  const activeRoute = useNavigationState((state) => getActiveRouteName(state));
+  const activeRoute = useNavigationState((state) => getActiveStackRouteName(state));
   const [expandedSections, setExpandedSections] = React.useState({});
+
+  const goToScreen = (screen, params) => {
+    navigation.navigate(MAIN_STACK_ROUTE, { screen, params });
+    navigation.dispatch(DrawerActions.closeDrawer());
+  };
 
   React.useEffect(() => {
     const category = MENU_CATEGORIES.find((c) => c.routes.includes(activeRoute));
@@ -185,7 +184,7 @@ const DrawerContent = () => {
       </View>
       <NavRow
         active={isHomeActive}
-        onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
+        onPress={() => goToScreen('Dashboard')}
       >
         <Icon
           name="home"
@@ -197,7 +196,7 @@ const DrawerContent = () => {
       </NavRow>
       <NavRow
         active={isTentangKamiActive}
-        onPress={() => navigation.navigate('TentangKami')}
+        onPress={() => goToScreen('TentangKami')}
       >
         <Icon2
           name="infocirlce"
@@ -227,7 +226,7 @@ const DrawerContent = () => {
                 key={item.route}
                 item={item}
                 activeRoute={activeRoute}
-                navigation={navigation}
+                onNavigate={goToScreen}
               />
             ))}
           </List.Accordion>
@@ -241,7 +240,7 @@ const DrawerContent = () => {
       </View>
       <NavRow
         active={isAnggaranActive}
-        onPress={() => navigation.navigate('DashboardAnggaranMurni')}
+        onPress={() => goToScreen('DashboardAnggaranMurni')}
       >
         <Icon
           name="chart-box"
