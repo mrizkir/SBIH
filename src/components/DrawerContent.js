@@ -3,153 +3,265 @@ import * as React from 'react';
 import { List } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Icon2 from 'react-native-vector-icons/AntDesign'
-import { useNavigation } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
+import { useNavigation, useNavigationState, DrawerActions } from '@react-navigation/native';
 
 import LogoBintan from '../assets/bintan.png'
 
+const HOME_ROUTES = ['Dashboard', 'Smart Bintan in Hand'];
+
+const getActiveRouteName = (state) => {
+  if (!state) return '';
+  const route = state.routes[state.index];
+  if (route.state) return getActiveRouteName(route.state);
+  return route.name;
+};
+
+const MENU_CATEGORIES = [
+  {
+    id: 'sosial',
+    title: 'Sosial',
+    routes: [
+      'DetailDashboard',
+      'DetailIPMDashboard',
+      'DetailPSDashboard',
+      'DetailRLSDashboard',
+      'DetailAMHDashboard',
+      'DetailAHHDashboard',
+      'DetailAKHBDashboard',
+      'DetailAKIMDashboard',
+      'DetailPKKDashboard',
+      'DetailIPGDashboard',
+      'DetailAPKDashboard',
+      'DetailAPMDashboard',
+      'DetailHLSDashboard',
+      'DetailJRTLHDashboard',
+      'DetailIGDashboard',
+      'DetailPPUDashboard',
+      'DetailIPGGDashboard',
+    ],
+    items: [
+      { title: 'Tingkat Kemiskinan', route: 'DetailDashboard' },
+      { title: 'Index Pembangunan Manusia', route: 'DetailIPMDashboard' },
+      { title: 'Prevalensi Stunting', route: 'DetailPSDashboard' },
+      { title: 'Angka Rata-Rata Lama Sekolah', route: 'DetailRLSDashboard' },
+      { title: 'Angka Melek Huruf', route: 'DetailAMHDashboard' },
+      { title: 'Angka Harapan Hidup', route: 'DetailAHHDashboard' },
+      { title: 'Angka Keberlangsungan Hidup Bayi', route: 'DetailAKHBDashboard' },
+      { title: 'Angka Kematian Ibu Melahirkan', route: 'DetailAKIMDashboard', lines: 3, titleMaxFontSizeMultiplier: 18 },
+      { title: 'Kondisi Ketenagakerjaan', route: 'DetailPKKDashboard' },
+      { title: 'Index Pembangunan Gender', route: 'DetailIPGDashboard' },
+      { title: 'Angka Partisipasi Kasar', route: 'DetailAPKDashboard' },
+      { title: 'Angka Partisipasi Murni', route: 'DetailAPMDashboard' },
+      { title: 'Angka Harapan Lama Sekolah', route: 'DetailHLSDashboard' },
+      { title: 'Rumah Tidak Layak Huni', route: 'DetailJRTLHDashboard' },
+      { title: 'Index Gini', route: 'DetailIGDashboard' },
+      { title: 'Penduduk Usia 15 Tahun', route: 'DetailPPUDashboard', lines: 3, titleMaxFontSizeMultiplier: 18 },
+      { title: 'Index pemberdayaan Gender', route: 'DetailIPGGDashboard' },
+    ],
+  },
+  {
+    id: 'ekonomi',
+    title: 'Ekonomi',
+    routes: ['DetailPEDashboard', 'DetailLIDashboard', 'DetailKWDashboard', 'DetailPMADashboard', 'DetailADHBDashboard', 'DetailADHKDashboard'],
+    items: [
+      { title: 'Pertumbuhan Ekonomi', route: 'DetailPEDashboard' },
+      { title: 'Tingkat Inflasi', route: 'DetailLIDashboard' },
+      { title: 'Kunjungan Wisata', route: 'DetailKWDashboard' },
+      { title: 'Realisasi Investasi', route: 'DetailPMADashboard' },
+      { title: 'PDRB ADHB', route: 'DetailADHBDashboard' },
+      { title: 'PDRB ADHK', route: 'DetailADHKDashboard' },
+    ],
+  },
+  {
+    id: 'pertanian',
+    title: 'Pertanian',
+    routes: ['DetailCPKUPDashboard', 'DetailCPKHDashboard', 'DetailJPPDashboard'],
+    items: [
+      { title: 'Produktivitas Perkebunan', route: 'DetailCPKUPDashboard', lines: 3 },
+      { title: 'Produktivitas Hortikultura', route: 'DetailCPKHDashboard' },
+      { title: 'Produksi Peternakan', route: 'DetailJPPDashboard' },
+    ],
+  },
+  {
+    id: 'perikanan',
+    title: 'Perikanan',
+    routes: ['DetailPPBDashboard', 'DetailPPTDashboard'],
+    items: [
+      { title: 'Produksi Budidaya', route: 'DetailPPBDashboard' },
+      { title: 'Produksi Tangkap', route: 'DetailPPTDashboard' },
+    ],
+  },
+  {
+    id: 'kependudukan',
+    title: 'Kependudukan',
+    routes: ['DetailPPDashboard', 'DetailJPDashboard', 'DetailJPBKUDashboard', 'DetailJPBKDashboard'],
+    items: [
+      { title: 'Pertumbuhan Penduduk', route: 'DetailPPDashboard' },
+      { title: 'Jumlah Penduduk', route: 'DetailJPDashboard' },
+      { title: 'Penduduk Berdasarkan Umur', route: 'DetailJPBKUDashboard', lines: 3 },
+      { title: 'Penduduk berdasarkan Kecamatan', route: 'DetailJPBKDashboard', lines: 3 },
+    ],
+  },
+  {
+    id: 'infrastruktur',
+    title: 'Infrastruktur',
+    routes: ['DetailPJDDDashboard', 'DetailPRTDashboard', 'DetailPTKJDashboard'],
+    items: [
+      { title: 'Panjang Jalan Dibangun', route: 'DetailPJDDDashboard', lines: 3 },
+      { title: '% Rumah Tangga yang Menggunakan Air Bersih', route: 'DetailPRTDashboard', lines: 3 },
+      { title: 'Tingkat Kemantapan Jalan', route: 'DetailPTKJDashboard', lines: 3 },
+    ],
+  },
+  {
+    id: 'video',
+    title: 'Video',
+    routes: ['DetailVideoDashboard'],
+    items: [
+      { title: 'Video', route: 'DetailVideoDashboard' },
+    ],
+  },
+];
+
+const accordionLeft = (props) => {
+  const { key, ...restProps } = props;
+  return <List.Icon {...restProps} icon="folder" />;
+};
+
+const NavRow = ({ active, onPress, children }) => (
+  <TouchableOpacity
+    style={[styles.navRow, active && styles.navRowActive]}
+    onPress={onPress}
+  >
+    {children}
+  </TouchableOpacity>
+);
+
+const MenuListItem = ({ item, activeRoute, navigation }) => {
+  const isActive = activeRoute === item.route;
+  return (
+    <List.Item
+      titleNumberOfLines={item.lines ?? 2}
+      titleMaxFontSizeMultiplier={item.titleMaxFontSizeMultiplier}
+      title={item.title}
+      style={isActive ? styles.menuItemActive : undefined}
+      titleStyle={[styles.menuItemTitle, isActive && styles.menuItemTitleActive]}
+      onPress={() => navigation.navigate(item.route)}
+    />
+  );
+};
+
 const DrawerContent = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+  const activeRoute = useNavigationState((state) => getActiveRouteName(state));
+  const [expandedSections, setExpandedSections] = React.useState({});
+
+  React.useEffect(() => {
+    const category = MENU_CATEGORIES.find((c) => c.routes.includes(activeRoute));
+    if (category) {
+      setExpandedSections((prev) => ({ ...prev, [category.id]: true }));
+    }
+  }, [activeRoute]);
+
+  const isSectionExpanded = (category) =>
+    expandedSections[category.id] ?? category.routes.includes(activeRoute);
+
+  const toggleSection = (categoryId) => {
+    const category = MENU_CATEGORIES.find((c) => c.id === categoryId);
+    setExpandedSections((prev) => {
+      const currentlyExpanded = prev[categoryId] ?? category.routes.includes(activeRoute);
+      return { ...prev, [categoryId]: !currentlyExpanded };
+    });
+  };
+
+  const isHomeActive = HOME_ROUTES.includes(activeRoute);
+  const isTentangKamiActive = activeRoute === 'TentangKami';
+  const isAnggaranActive = activeRoute === 'DashboardAnggaranMurni';
+
   return (
     <View style={styles.container}>
       <View style={styles.titleHeader}>
         <Image source={LogoBintan} style={{ width: 100, height: 100 }} />
         <Text style={styles.titleText}>Smart Bintan in Hands</Text>
       </View>
-      <TouchableOpacity
-        style={{ flexDirection: 'row', alignItems: 'center' }}
+      <NavRow
+        active={isHomeActive}
         onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
       >
-        <Icon name="home" size={30} color="black" style={{ marginVertical: 10, marginHorizontal: 10 }} />
-        <Text style={{ marginVertical: 10, marginHorizontal: 10, color: 'black', fontSize: 12  }}>Home</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ flexDirection: 'row', alignItems: 'center' }}
-        onPress={()=> navigation.navigate('TentangKami')}
+        <Icon
+          name="home"
+          size={30}
+          color={isHomeActive ? '#0074BD' : 'black'}
+          style={styles.navIcon}
+        />
+        <Text style={[styles.navLabel, isHomeActive && styles.navLabelActive]}>Home</Text>
+      </NavRow>
+      <NavRow
+        active={isTentangKamiActive}
+        onPress={() => navigation.navigate('TentangKami')}
       >
-        <Icon2 name="infocirlce" size={26} color="black" style={{ marginVertical: 10, marginHorizontal: 10 }} />
-        <Text style={{ marginVertical: 10, marginHorizontal: 10, color: 'black', fontSize: 12  }}>Tentang Kami</Text>
-      </TouchableOpacity>
-      {/* separator */}
-      <View style={{ borderBottomWidth: 1, borderBottomColor: 'black', marginVertical: 5 }}></View>
+        <Icon2
+          name="infocirlce"
+          size={26}
+          color={isTentangKamiActive ? '#0074BD' : 'black'}
+          style={styles.navIcon}
+        />
+        <Text style={[styles.navLabel, isTentangKamiActive && styles.navLabelActive]}>Tentang Kami</Text>
+      </NavRow>
+      <View style={styles.separator} />
 
-
-      <List.Section title="Kategori" titleStyle={{ fontSize: 12 }}>
-        <List.Accordion
-          title="Sosial"
-          titleStyle={{ fontSize: 12 }}
-          left={props => {
-            const { key, ...restProps } = props;
-            return <List.Icon {...restProps} icon="folder" />;
-          }}>
-          <List.Item titleNumberOfLines={2} title="Tingkat Kemiskinan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Index Pembangunan Manusia" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailIPMDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Prevalensi Stunting" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailPSDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Angka Rata-Rata Lama Sekolah" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailRLSDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Angka Melek Huruf" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAMHDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Angka Harapan Hidup" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAHHDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Angka Keberlangsungan Hidup Bayi" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAKHBDashboard')}/>
-          <List.Item titleNumberOfLines={3} titleMaxFontSizeMultiplier={18} title="Angka Kematian Ibu Melahirkan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAKIMDashboard')}/>
-          <List.Item titleNumberOfLines={2} title="Kondisi Ketenagakerjaan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailPKKDashboard')}/>
-          <List.Item titleNumberOfLines={2} title="Index Pembangunan Gender" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailIPGDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Angka Partisipasi Kasar" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAPKDashboard')}  />
-          <List.Item titleNumberOfLines={2} title="Angka Partisipasi Murni" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailAPMDashboard')}  />
-          <List.Item titleNumberOfLines={2} title="Angka Harapan Lama Sekolah" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailHLSDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Rumah Tidak Layak Huni" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailJRTLHDashboard')} />
-          <List.Item titleNumberOfLines={2} title="Index Gini" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailIGDashboard")} />
-          {/* <List.Item titleNumberOfLines={2} title="Index Daya Beli (Purchasing Power Parity)" onPress={() => navigation.navigate("DetailIDBDashboard")} /> */}
-          <List.Item titleNumberOfLines={3} titleMaxFontSizeMultiplier={18} title="Penduduk Usia 15 Tahun" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPPUDashboard")}/>
-          <List.Item titleNumberOfLines={2} title="Index pemberdayaan Gender" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailIPGGDashboard")}/>
-
-        </List.Accordion>
-        <List.Accordion
-          title="Ekonomi"
-          titleStyle={{ fontSize: 12 }}
-          left={props => {
-            const { key, ...restProps } = props;
-            return <List.Icon {...restProps} icon="folder" />;
-          }}>
-          <List.Item titleNumberOfLines={2} title="Pertumbuhan Ekonomi" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPEDashboard")} />
-          <List.Item titleNumberOfLines={2} title="Tingkat Inflasi" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailLIDashboard")} />
-          <List.Item titleNumberOfLines={2} title="Kunjungan Wisata" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailKWDashboard")} />
-          <List.Item titleNumberOfLines={2} title="Realisasi Investasi" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPMADashboard")}/>
-          <List.Item titleNumberOfLines={2} title="PDRB ADHB" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailADHBDashboard")} />
-          <List.Item titleNumberOfLines={2} title="PDRB ADHK" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailADHKDashboard")}/>
-        </List.Accordion>
-        <List.Accordion
-          title="Pertanian dan Perikanan"
-          titleStyle={{ fontSize: 12 }}
-          left={props => {
-            const { key, ...restProps } = props;
-            return <List.Icon {...restProps} icon="folder" />;
-          }}>
-          <List.Item titleNumberOfLines={2} title="Produksi Perikanan Budidaya" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPPBDashboard")}/>
-          <List.Item titleNumberOfLines={2} title="Produksi Perikanan Tangkap" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPPTDashboard")}/>
-          <List.Item titleNumberOfLines={3} title="Produktivitas Perkebunan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailCPKUPDashboard")} />
-          <List.Item titleNumberOfLines={2} title="Produktivitas Hortikultura" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailCPKHDashboard")} />
-          <List.Item titleNumberOfLines={2} title="Produksi Peternakan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailJPPDashboard")}/>
-        </List.Accordion>
-        <List.Accordion
-          title="Kependudukan"
-          titleStyle={{ fontSize: 12 }}
-          left={props => {
-            const { key, ...restProps } = props;
-            return <List.Icon {...restProps} icon="folder" />;
-          }}>
-          <List.Item titleNumberOfLines={2} title="Pertumbuhan Penduduk" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPPDashboard")}/>
-          <List.Item titleNumberOfLines={2} title="Jumlah Penduduk" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailJPDashboard")}/>
-          <List.Item titleNumberOfLines={3} title="Penduduk Berdasarkan Umur" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailJPBKUDashboard")}/>
-          <List.Item titleNumberOfLines={3} title="Penduduk berdasarkan Kecamatan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailJPBKDashboard")}/>
-        </List.Accordion>
-        <List.Accordion
-          title="Infrastruktur"
-          titleStyle={{ fontSize: 12 }}
-          left={props => {
-            const { key, ...restProps } = props;
-            return <List.Icon {...restProps} icon="folder" />;
-          }}>
-          <List.Item titleNumberOfLines={3} title="Panjang Jalan Dibangun" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPJDDDashboard")} />
-          <List.Item titleNumberOfLines={3} title="% Rumah Tangga yang Menggunakan Air Bersih" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPRTDashboard")} />
-          <List.Item titleNumberOfLines={3} title="Tingkat Kemantapan Jalan" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate("DetailPTKJDashboard")} />
-        </List.Accordion>
-        <List.Accordion
-          title="Video"
-          titleStyle={{ fontSize: 12 }}
-          left={props => {
-            const { key, ...restProps } = props;
-            return <List.Icon {...restProps} icon="folder" />;
-          }}>
-          <List.Item titleNumberOfLines={2} title="Video" titleStyle={{ fontSize: 12 }} onPress={() => navigation.navigate('DetailVideoDashboard')} />
-        </List.Accordion>
+      <List.Section title="Kategori" titleStyle={styles.sectionTitle}>
+        {MENU_CATEGORIES.map((category) => (
+          <List.Accordion
+            key={category.id}
+            title={category.title}
+            titleStyle={[
+              styles.accordionTitle,
+              category.routes.includes(activeRoute) && styles.accordionTitleActive,
+            ]}
+            expanded={isSectionExpanded(category)}
+            onPress={() => toggleSection(category.id)}
+            left={accordionLeft}
+          >
+            {category.items.map((item) => (
+              <MenuListItem
+                key={item.route}
+                item={item}
+                activeRoute={activeRoute}
+                navigation={navigation}
+              />
+            ))}
+          </List.Accordion>
+        ))}
       </List.Section>
-      {/* separator with text inline */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-        <View style={{ borderBottomWidth: 1, borderBottomColor: 'black', flex: 1 }}></View>
-        <Text style={{ marginHorizontal: 5, color: 'black', fontSize: 12  }}>E-money</Text>
-        <View style={{ borderBottomWidth: 1, borderBottomColor: 'black', flex: 1 }}></View>
+
+      <View style={styles.separatorRow}>
+        <View style={styles.separatorLine} />
+        <Text style={styles.separatorLabel}>E-money</Text>
+        <View style={styles.separatorLine} />
       </View>
-      <TouchableOpacity
-        style={{ flexDirection: 'row', alignItems: 'center' }}
+      <NavRow
+        active={isAnggaranActive}
         onPress={() => navigation.navigate('DashboardAnggaranMurni')}
       >
-        <Icon name="chart-box" size={30} color="black" style={{ marginVertical: 10, marginHorizontal: 10  }} />
-        <Text style={{ marginVertical: 10, marginHorizontal: 10, color: 'black', fontSize: 12  }}>Anggaran Murni dan Perubahan</Text>
-      </TouchableOpacity>
-      {/* <TouchableOpacity
-        style={{ flexDirection: 'row', alignItems: 'center' }}
-      >
-        <Icon name="chart-tree" size={30} color="black" style={{ marginVertical: 10, marginHorizontal: 10 }} />
-        <Text style={{ marginVertical: 10, marginHorizontal: 10, color: 'black'  }}>Realisasi OPD</Text>
-      </TouchableOpacity> */}
+        <Icon
+          name="chart-box"
+          size={30}
+          color={isAnggaranActive ? '#0074BD' : 'black'}
+          style={styles.navIcon}
+        />
+        <Text style={[styles.navLabel, isAnggaranActive && styles.navLabelActive]}>
+          Anggaran Murni dan Perubahan
+        </Text>
+      </NavRow>
     </View>
-  )
-}
+  );
+};
 
 export default DrawerContent
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   titleHeader: {
     padding: 10,
@@ -159,6 +271,67 @@ const styles = StyleSheet.create({
   },
   titleText: {
     color: 'white',
-    fontSize: 12
-  }
+    fontSize: 12,
+  },
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  navRowActive: {
+    backgroundColor: '#E3F2FD',
+  },
+  navIcon: {
+    marginVertical: 10,
+    marginHorizontal: 10,
+  },
+  navLabel: {
+    marginVertical: 10,
+    marginHorizontal: 10,
+    color: 'black',
+    fontSize: 12,
+  },
+  navLabelActive: {
+    color: '#0074BD',
+    fontWeight: '600',
+  },
+  separator: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'black',
+    marginVertical: 5,
+  },
+  sectionTitle: {
+    fontSize: 12,
+  },
+  accordionTitle: {
+    fontSize: 12,
+  },
+  accordionTitleActive: {
+    color: '#0074BD',
+    fontWeight: '600',
+  },
+  menuItemTitle: {
+    fontSize: 12,
+  },
+  menuItemTitleActive: {
+    color: '#0074BD',
+    fontWeight: '600',
+  },
+  menuItemActive: {
+    backgroundColor: '#E3F2FD',
+  },
+  separatorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  separatorLine: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'black',
+    flex: 1,
+  },
+  separatorLabel: {
+    marginHorizontal: 5,
+    color: 'black',
+    fontSize: 12,
+  },
 })

@@ -13,12 +13,12 @@ const DetailPPTDashboard = (props) => {
       screenOptions={materialTopTabScreenOptions}
     >
       <Tab.Screen
-        name="Detail Produksi Perikanan Tangkap (PPT)"
+        name="Detail Produksi Perikanan Tangkap"
         component={DetailPPT}
         initialParams={{ title: "Data Produksi Perikanan Tangkap (Ton)" }}
       />
       <Tab.Screen
-        name="Grafik Produksi Perikanan Tangkap (PPT)"
+        name="Grafik Produksi Perikanan Tangkap"
         component={GrafikPPT}
         initialParams={{ title: "Data Produksi Perikanan Tangkap (Ton)" }}
       />

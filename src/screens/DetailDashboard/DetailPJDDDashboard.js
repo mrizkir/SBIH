@@ -12,12 +12,12 @@ const DetailPJDDDashboard = (props) => {
     screenOptions={materialTopTabScreenOptions}
     >
         <Tab.Screen 
-        name="Detail Panjang Jalan yang Dibangun dan Ditingkatkan" 
+        name="Detail Panjang Jalan Dibangun" 
         component={DetailPJDD} 
         initialParams={{  title: "Panjang Jalan Dibangun" }}
         />
         <Tab.Screen 
-        name="Grafik PanjangnJalan yang Dibangun dan Ditingkatkan" 
+        name="Grafik Panjang Jalan Dibangun" 
         component={GrafikPJDD} 
         initialParams={{  title: "Panjang Jalan Dibangun" }}
         />
