@@ -67,7 +67,7 @@ const DetailPS = (props) => {
             <Text style={styles.headerTitle}>{props.route.params.title}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
-              <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
+              <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>EPPGBM</Text></Text>
             </View>
           </View>
         </View>

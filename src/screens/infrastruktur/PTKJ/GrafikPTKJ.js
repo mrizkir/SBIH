@@ -43,8 +43,13 @@ const GrafikPTKJ = (props) => {
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>{props.route.params.title}</Text>
             <View style={styles.sourceContainer}>
+            <Text style={styles.sourceText}>
+                Data Persentase Tingkat Kemantapan Jalan (PTKJ). 
+              </Text>
               <Icon name="document-text-outline" size={16} color="#666" />
-              <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
+              <Text style={styles.sourceText}>                
+                Sumber: <Text style={styles.sourceBPS}>BPS</Text>
+              </Text>
             </View>
           </View>
         </View>

@@ -13,14 +13,14 @@ const DetailPTKJDashboard = (props) => {
       screenOptions={materialTopTabScreenOptions}
     >
       <Tab.Screen
-        name="Detail Persentase Tingkat Kemantapan Jalan (PTKJ) "
+        name="Detail Tingkat Kemantapan Jalan"
         component={DetailPTKJ}
-        initialParams={{ title: "Data Persentase Tingkat Kemantapan Jalan (PTKJ) " }}
+        initialParams={{ title: "Tingkat Kemantapan Jalan" }}
       />
       <Tab.Screen
-        name="Grafik Persentase Tingkat Kemantapan Jalan (PTKJ) "
+        name="Grafik Tingkat Kemantapan Jalan"
         component={GrafikPTKJ}
-        initialParams={{ title: "Data Persentase Tingkat Kemantapan Jalan (PTKJ) " }}
+        initialParams={{ title: "Tingkat Kemantapan Jalan" }}
       />
     </Tab.Navigator>
   )
