@@ -115,7 +115,7 @@ const DetailCPKUP = (props) => {
                       <Text style={[styles.cpkupValue, { color: category.color }]}>
                         {formatNumber(item.jumlah)}
                       </Text>
-                      <Text style={styles.cpkupLabel}>Ton</Text>
+                      <Text style={styles.cpkupLabel}>Ton/Ha</Text>
                     </View>
                   </View>
                   
@@ -141,7 +141,7 @@ const DetailCPKUP = (props) => {
 
                 <View style={styles.cardFooter}>
                   <Icon name="information-circle-outline" size={16} color="#999" />
-                  <Text style={styles.footerText}>Capaian Produksi Komoditi Unggulan Perkebunan (Ton)</Text>
+                  <Text style={styles.footerText}>Capaian Produksi Komoditi Unggulan Perkebunan (Ton/Ha)</Text>
                 </View>
               </View>
             </AnimatedCard>

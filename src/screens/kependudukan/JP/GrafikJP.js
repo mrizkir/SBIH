@@ -189,7 +189,7 @@ const GrafikJP = (props) => {
             </View>
             <View style={styles.infoRow}>
               <View style={styles.infoDot} />
-              <Text style={styles.infoText}>Total penduduk terkini: {formatNumber(latestData.total)} orang</Text>
+              <Text style={styles.infoText}>Total penduduk terkini: {formatNumber(latestData.total)} Jiwa</Text>
             </View>
           </View>
         </View>

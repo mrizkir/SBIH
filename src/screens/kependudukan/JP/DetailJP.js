@@ -145,7 +145,7 @@ const DetailPP = (props) => {
                     <Icon name="people" size={20} color="#3949ab" />
                     <View style={styles.totalContent}>
                       <Text style={styles.totalLabel}>Total Penduduk</Text>
-                      <Text style={styles.totalValue}>{formatNumber(item?.total)} Orang</Text>
+                      <Text style={styles.totalValue}>{formatNumber(item?.total)} Jiwa</Text>
                     </View>
                   </View>
                 </View>

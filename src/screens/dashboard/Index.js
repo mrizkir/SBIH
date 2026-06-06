@@ -525,9 +525,9 @@ const Index = () => {
                       
                       {card.isPopulation ? (
                         <View style={styles.populationData}>
-                          <Text style={styles.cardValue}>Laki: {card.getValue().laki} Orang</Text>
-                          <Text style={styles.cardValue}>Perempuan: {card.getValue().perempuan} Orang</Text>
-                          <Text style={styles.cardValueTotal}>Total: {card.getValue().total} Orang</Text>
+                          <Text style={styles.cardValue}>Laki: {card.getValue().laki} Jiwa</Text>
+                          <Text style={styles.cardValue}>Perempuan: {card.getValue().perempuan} Jiwa</Text>
+                          <Text style={styles.cardValueTotal}>Total: {card.getValue().total} Jiwa</Text>
                         </View>
                       ) : (
                         <Text style={styles.cardValue}>{card.getValue()}</Text>
