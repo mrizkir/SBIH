@@ -9,7 +9,7 @@ const Tab = createMaterialTopTabNavigator()
 const DetailKWDashboard = (props) => {
   return (
     <Tab.Navigator
-    screenOptions={materialTopTabScreenOptions}
+    screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
         <Tab.Screen 
         name="Detail Kunjungan Wisata" 

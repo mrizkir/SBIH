@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataIndeksGini } from '../../../state/dataIG'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailIG = (props) => {
   const {dataIndeksGini} = stateDataIndeksGini()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getGiniCategory = (gini) => {
+    const getGiniCategory = (gini) => {
     const value = parseFloat(gini);
     if (value < 0.3) return { label: 'Rendah (Merata)', color: '#43a047', icon: 'checkmark-circle' };
     if (value >= 0.3 && value < 0.4) return { label: 'Sedang', color: '#1e88e5', icon: 'remove-circle' };
@@ -64,7 +58,7 @@ const DetailIG = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#8e24aa" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

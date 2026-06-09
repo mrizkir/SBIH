@@ -10,7 +10,7 @@ const DetailJPBKDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Jumlah Penduduk Berdasarkan Kecamatan (JPBK) "

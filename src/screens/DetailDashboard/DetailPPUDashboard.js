@@ -10,7 +10,7 @@ const DetailPPUDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Persentase penduduk Usia 15 Tahun Ke Atas Menurut Pendidikan yang Di Tamatkan"

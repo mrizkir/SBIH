@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataAngkaKematianIbuMelahirkan } from '../../../state/dataAKIM'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,14 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailAKIM = (props) => {
   const {dataAngkaKematianIbuMelahirkan} = stateDataAngkaKematianIbuMelahirkan()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getAKIMCategory = (kematian) => {
+    const getAKIMCategory = (kematian) => {
     const value = parseFloat(kematian);
     if (value < 100) return { label: 'Sangat Baik', color: '#43a047' };
     if (value >= 100 && value < 150) return { label: 'Baik', color: '#1e88e5' };
@@ -56,7 +49,7 @@ const DetailAKIM = (props) => {
   };
 
   // Sort data by year in descending order (current year to past years)
-  const sortedData = [...(dataAngkaKematianIbuMelahirkan || [])].sort((a, b) => b.tahun - a.tahun);
+  const sortedData = sortByTahunDesc(dataAngkaKematianIbuMelahirkan);
 
   return (
     <View style={styles.container}>
@@ -64,7 +57,7 @@ const DetailAKIM = (props) => {
         <View style={styles.headerTop}>
           <Icon name="medkit" size={32} color="#c2185b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

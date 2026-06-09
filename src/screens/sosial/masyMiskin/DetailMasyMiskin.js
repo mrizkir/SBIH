@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataPenduduk } from '../../../state/dataPenduduk'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -44,13 +44,7 @@ const DetailMasyMiskin = (props) => {
     return parseInt(b.tahun) - parseInt(a.tahun);
   }) || [];
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getKemiskinanCategory = (persentase) => {
+    const getKemiskinanCategory = (persentase) => {
     const value = parseFloat(persentase);
     if (value < 5) return { label: 'Sangat Rendah', color: '#43a047', icon: 'happy' };
     if (value >= 5 && value < 10) return { label: 'Rendah', color: '#1e88e5', icon: 'trending-down' };
@@ -64,7 +58,7 @@ const DetailMasyMiskin = (props) => {
         <View style={styles.headerTop}>
           <Icon name="hand-right" size={32} color="#e53935" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <Text style={styles.sourceText}>
               Data Persentase Tingkat Kemiskinan.
             </Text>

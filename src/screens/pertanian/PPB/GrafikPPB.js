@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { LineChart } from "react-native-chart-kit";
 import { stateDataProduksiPerikananBudidaya } from '../../../state/dataPPB';
 import { color, formatNumber } from '../../../constants/Helper';
@@ -7,16 +7,25 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const GrafikPPB = (props) => {
   const {dataProduksiPerikananBudidaya} = stateDataProduksiPerikananBudidaya()
-  
-  // Ambil 5 tahun terakhir
-  const last5Years = dataProduksiPerikananBudidaya.slice(-5);
-  
-  // Hitung statistik dari 5 tahun terakhir
-  const values = last5Years.map(item => parseFloat(item.jumlah));
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
-  const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0);
-  const latestValue = values[values.length - 1];
+  const title = props.route.params?.title ?? 'Data Produksi Perikanan Budidaya (Ton)';
+
+  const last5Years = useMemo(() => {
+    if (!Array.isArray(dataProduksiPerikananBudidaya)) return [];
+    return dataProduksiPerikananBudidaya.slice(-5);
+  }, [dataProduksiPerikananBudidaya]);
+
+  const values = useMemo(
+    () => last5Years.map(item => parseFloat(item.jumlah) || 0),
+    [last5Years],
+  );
+
+  const hasChartData = last5Years.length > 0;
+  const maxValue = hasChartData ? Math.max(...values) : 0;
+  const minValue = hasChartData ? Math.min(...values) : 0;
+  const avgValue = hasChartData
+    ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0)
+    : '0';
+  const latestValue = hasChartData ? values[values.length - 1] : 0;
 
 
   // Kategori PPB
@@ -37,7 +46,7 @@ const GrafikPPB = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#00796b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{title}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceDinas}>Dinas Perikanan Kab. Bintan</Text></Text>
@@ -59,6 +68,7 @@ const GrafikPPB = (props) => {
         </View>
 
         {/* Statistics Cards */}
+        {hasChartData ? (
         <View style={styles.statsContainer}>
           <View style={[styles.statCard, { backgroundColor: '#43a047' }]}>
             <Icon name="trending-up" size={24} color="#fff" />
@@ -78,8 +88,15 @@ const GrafikPPB = (props) => {
             <Text style={styles.statLabel}>Rata-rata</Text>
           </View>
         </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Icon name="fish-outline" size={80} color="#ccc" />
+            <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+          </View>
+        )}
 
         {/* Chart Card */}
+        {hasChartData && (
         <View style={styles.chartCard}>
           <View style={styles.chartHeader}>
             <Icon name="bar-chart" size={24} color="#00796b" />
@@ -143,8 +160,10 @@ const GrafikPPB = (props) => {
             </View>
           </View>
         </View>
+        )}
 
         {/* Trend Analysis */}
+        {hasChartData && (
         <View style={styles.trendCard}>
           <View style={styles.trendHeader}>
             <Icon name="analytics-outline" size={24} color="#00796b" />
@@ -166,6 +185,7 @@ const GrafikPPB = (props) => {
             </Text>
           </View>
         </View>
+        )}
 
         {/* Info Card */}
         <View style={styles.infoCard}>
@@ -269,6 +289,18 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 30,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   periodCard: {
     flexDirection: 'row',

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated, ActivityIndicator } from 'react-native'
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { stateDataAngkaMelekHuruf } from '../../../state/dataAMH'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 import axios from 'axios'
 import { baseURL } from '../../../constants/General'
@@ -70,15 +70,7 @@ const DetailAMH = (props) => {
     return [...(dataAngkaMelekHuruf || [])].sort((a, b) => b.tahun - a.tahun);
   }, [dataAngkaMelekHuruf]);
 
-  const getStatusColor = (status) => {
-    if (!status || typeof status !== 'string') return '#666';
-    const statusLower = status.toLowerCase();
-    if (statusLower.includes('tetap')) return '#43a047';
-    if (statusLower.includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getLiteracyCategory = (jumlah) => {
+    const getLiteracyCategory = (jumlah) => {
     const value = parseFloat(jumlah);
     if (value >= 150000) return { label: 'Sangat Baik', color: '#43a047' };
     if (value >= 100000 && value < 150000) return { label: 'Baik', color: '#1e88e5' };
@@ -95,7 +87,7 @@ const DetailAMH = (props) => {
         <View style={styles.headerTop}>
           <Icon name="book" size={32} color="#00897b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

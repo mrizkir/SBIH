@@ -9,15 +9,16 @@ const GrafikKW = (props) => {
   const { dataKunjunganWisata } = stateDataKunjunganWisata()
 
   // Urutkan data berdasarkan tahun dari terendah ke tertinggi, lalu ambil 5 tahun terakhir
-  const sortedData = [...dataKunjunganWisata].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
-  const last5Years = sortedData.slice(-5);
+  const sortedData = [...(Array.isArray(dataKunjunganWisata) ? dataKunjunganWisata : [])].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
+  const last5Years = (Array.isArray(sortedData) ? sortedData : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
   
   // Hitung statistik dari 5 tahun terakhir
   const values = last5Years.map(item => parseFloat(item.jumlah));
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
-  const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0);
-  const latestValue = values[values.length - 1];
+  const maxValue = values.length > 0 ? Math.max(...values) : 0;
+  const minValue = values.length > 0 ? Math.min(...values) : 0;
+  const avgValue = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0) : '0';
+  const latestValue = values.length > 0 ? values[values.length - 1] : 0;
 
 
   // Kategori KW
@@ -38,7 +39,7 @@ const GrafikKW = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -88,6 +89,7 @@ const GrafikKW = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -127,6 +129,12 @@ const GrafikKW = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Current Value */}
@@ -266,6 +274,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

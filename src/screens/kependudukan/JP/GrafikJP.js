@@ -9,8 +9,10 @@ const GrafikJP = (props) => {
   const { dataJumlahPenduduk } = stateDataJumlahPenduduk()
 
   // Urutkan data berdasarkan tahun dari terdahulu hingga sekarang, lalu ambil 5 tahun terakhir
-  const sortedData = [...(dataJumlahPenduduk || [])].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
+  const sortedData = [...(Array.isArray(dataJumlahPenduduk) ? dataJumlahPenduduk : [])]
+    .sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
   const last5Years = sortedData.slice(-5);
+  const hasChartData = last5Years.length > 0;
   
   // Data untuk grafik
   const lakiData = last5Years.map(item => parseInt(item.laki));
@@ -18,14 +20,18 @@ const GrafikJP = (props) => {
   const totalData = last5Years.map(item => parseInt(item.total));
   
   // Statistik
-  const latestData = last5Years[last5Years.length - 1];
-  const maxTotal = Math.max(...totalData);
-  const minTotal = Math.min(...totalData);
+  const latestData = hasChartData ? last5Years[last5Years.length - 1] : null;
+  const maxTotal = totalData.length > 0 ? Math.max(...totalData) : 0;
+  const minTotal = totalData.length > 0 ? Math.min(...totalData) : 0;
   
 
   // Hitung persentase gender
-  const lakiPct = ((parseInt(latestData.laki) / parseInt(latestData.total)) * 100).toFixed(1);
-  const perempuanPct = ((parseInt(latestData.perempuan) / parseInt(latestData.total)) * 100).toFixed(1);
+  const lakiPct = latestData
+    ? ((parseInt(latestData.laki) / parseInt(latestData.total)) * 100).toFixed(1)
+    : '0';
+  const perempuanPct = latestData
+    ? ((parseInt(latestData.perempuan) / parseInt(latestData.total)) * 100).toFixed(1)
+    : '0';
 
   return (
     <View style={styles.container}>
@@ -34,7 +40,7 @@ const GrafikJP = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#3949ab" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -57,14 +63,14 @@ const GrafikJP = (props) => {
 
         {/* Current Statistics */}
         <View style={styles.currentStatsCard}>
-          <Text style={styles.currentStatsTitle}>Data Terkini ({latestData.tahun})</Text>
+          <Text style={styles.currentStatsTitle}>Data Terkini ({latestData?.tahun ?? '-'})</Text>
           <View style={styles.currentStatsContent}>
             <View style={styles.currentStatItem}>
               <Icon name="male" size={24} color="#1e88e5" />
               <View style={styles.currentStatText}>
                 <Text style={styles.currentStatLabel}>Laki-laki</Text>
                 <Text style={[styles.currentStatValue, { color: '#1e88e5' }]}>
-                  {formatNumber(latestData.laki)}
+                  {formatNumber(latestData?.laki ?? 0)}
                 </Text>
                 <Text style={styles.currentStatPct}>{lakiPct}%</Text>
               </View>
@@ -77,7 +83,7 @@ const GrafikJP = (props) => {
               <View style={styles.currentStatText}>
                 <Text style={styles.currentStatLabel}>Perempuan</Text>
                 <Text style={[styles.currentStatValue, { color: '#e91e63' }]}>
-                  {formatNumber(latestData.perempuan)}
+                  {formatNumber(latestData?.perempuan ?? 0)}
                 </Text>
                 <Text style={styles.currentStatPct}>{perempuanPct}%</Text>
               </View>
@@ -90,7 +96,7 @@ const GrafikJP = (props) => {
               <View style={styles.currentStatText}>
                 <Text style={styles.currentStatLabel}>Total</Text>
                 <Text style={[styles.currentStatValue, { color: '#3949ab' }]}>
-                  {formatNumber(latestData.total)}
+                  {formatNumber(latestData?.total ?? 0)}
                 </Text>
                 <Text style={styles.currentStatPct}>100%</Text>
               </View>
@@ -99,6 +105,7 @@ const GrafikJP = (props) => {
         </View>
 
         {/* Chart Card */}
+        {hasChartData ? (
         <View style={styles.chartCard}>
           <View style={styles.chartHeader}>
             <Icon name="bar-chart" size={24} color="#3949ab" />
@@ -154,7 +161,6 @@ const GrafikJP = (props) => {
               style={styles.chart}
             />
           </View>
-
           {/* Legend Custom */}
           <View style={styles.legendContainer}>
             <View style={styles.legendItem}>
@@ -167,6 +173,12 @@ const GrafikJP = (props) => {
             </View>
           </View>
         </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Icon name="bar-chart-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+          </View>
+        )}
 
         {/* Info Card */}
         <View style={styles.infoCard}>
@@ -189,14 +201,14 @@ const GrafikJP = (props) => {
             </View>
             <View style={styles.infoRow}>
               <View style={styles.infoDot} />
-              <Text style={styles.infoText}>Total penduduk terkini: {formatNumber(latestData.total)} Jiwa</Text>
+              <Text style={styles.infoText}>Total penduduk terkini: {formatNumber(latestData?.total ?? 0)} Jiwa</Text>
             </View>
           </View>
         </View>
 
         {/* Gender Ratio Card */}
         <View style={styles.ratioCard}>
-          <Text style={styles.ratioTitle}>Rasio Gender ({latestData.tahun})</Text>
+          <Text style={styles.ratioTitle}>Rasio Gender ({latestData?.tahun ?? '-'})</Text>
           <View style={styles.ratioBar}>
             <View style={[styles.ratioBarFill, { width: `${lakiPct}%`, backgroundColor: '#1e88e5' }]}>
               <Text style={styles.ratioBarText}>{lakiPct}%</Text>
@@ -256,6 +268,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

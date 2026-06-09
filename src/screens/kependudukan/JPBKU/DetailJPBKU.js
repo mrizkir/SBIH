@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Modal, TouchableOpacity, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataJumlahPendudukBerdasarkanKelompokUmur } from '../../../state/dataJPBKU'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -37,12 +37,15 @@ const AnimatedCard = ({ children, delay = 0 }) => {
     );
 };
 
-const DetailPP = (props) => {
+const DetailJPBKU = (props) => {
   const { dataJumlahPendudukBerdasarkanKelompokUmur } = stateDataJumlahPendudukBerdasarkanKelompokUmur()
+  const safeData = Array.isArray(dataJumlahPendudukBerdasarkanKelompokUmur)
+    ? dataJumlahPendudukBerdasarkanKelompokUmur
+    : [];
   
   // Sort data dari tahun terbaru ke terlama untuk filter awal
-  const initialFilteredData = dataJumlahPendudukBerdasarkanKelompokUmur
-    ?.filter(item => item.kelompok_umur == 1)
+  const initialFilteredData = safeData
+    .filter(item => item.kelompok_umur == 1)
     ?.sort((a, b) => {
       const yearA = parseInt(a.tahun) || 0;
       const yearB = parseInt(b.tahun) || 0;
@@ -89,15 +92,7 @@ const DetailPP = (props) => {
     setModalVisible(false)
   }
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getAgeCategory = (groupId) => {
+    const getAgeCategory = (groupId) => {
     if (groupId >= 1 && groupId <= 3) return { label: 'Anak', color: '#42A5F5' };
     if (groupId >= 4 && groupId <= 6) return { label: 'Remaja-Dewasa Muda', color: '#66BB6A' };
     if (groupId >= 7 && groupId <= 11) return { label: 'Dewasa', color: '#FFA726' };
@@ -113,7 +108,7 @@ const DetailPP = (props) => {
         <View style={styles.headerTop}>
           <Icon name="people" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -294,7 +289,7 @@ const DetailPP = (props) => {
   )
 }
 
-export default DetailPP
+export default DetailJPBKU
 
 const styles = StyleSheet.create({
   container: {

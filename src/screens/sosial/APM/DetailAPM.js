@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated, TouchableOpacity } from 'react-native'
 import React, { useRef, useEffect, useState } from 'react'
 import { stateDataAngkaPartisipasiMurni } from '../../../state/dataAPM'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -41,20 +41,13 @@ const DetailAPM = (props) => {
   const { dataAngkaPartisipasiMurni } = stateDataAngkaPartisipasiMurni()
 
   // Sort data by year in descending order (current year to past years)
-  const sortedData = [...(dataAngkaPartisipasiMurni || [])].sort((a, b) => b.tahun - a.tahun);
+  const sortedData = sortByTahunDesc(dataAngkaPartisipasiMurni);
 
   const [expanded, setExpanded] = useState(false);
   const [dataFiltered, setDataFiltered] = useState(sortedData.filter(item => item.no === 1))
   const [selectedLevel, setSelectedLevel] = useState('SD')
   
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getAPMCategory = (apm) => {
+    const getAPMCategory = (apm) => {
     const value = parseFloat(apm);
     if (value >= 95) return { label: 'Sangat Baik', color: '#43a047', icon: 'school' };
     if (value >= 85 && value < 95) return { label: 'Baik', color: '#1e88e5', icon: 'book' };

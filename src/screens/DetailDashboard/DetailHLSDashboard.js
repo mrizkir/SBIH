@@ -10,7 +10,7 @@ const DetailHLSDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Angka Harapan Lama Sekolah"

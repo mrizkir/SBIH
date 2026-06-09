@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated, TouchableOpacity } from 'react-native'
 import React, { useRef, useEffect, useState } from 'react'
 import { stateDataAngkaPartisipasiKasar } from '../../../state/dataAPK'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -41,20 +41,13 @@ const DetailAPK = (props) => {
   const { dataAngkaPartisipasiKasar } = stateDataAngkaPartisipasiKasar()
 
   // Sort data by year in descending order (current year to past years)
-  const sortedData = [...(dataAngkaPartisipasiKasar || [])].sort((a, b) => b.tahun - a.tahun);
+  const sortedData = sortByTahunDesc(dataAngkaPartisipasiKasar);
 
   const [expanded, setExpanded] = useState(false);
   const [dataFiltered, setDataFiltered] = useState(sortedData.filter(item => item.no === 1))
   const [selectedLevel, setSelectedLevel] = useState('SD')
   
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getAPKCategory = (apk) => {
+    const getAPKCategory = (apk) => {
     const value = parseFloat(apk);
     if (value >= 100) return { label: 'Sangat Baik', color: '#43a047', icon: 'school' };
     if (value >= 90 && value < 100) return { label: 'Baik', color: '#1e88e5', icon: 'book' };

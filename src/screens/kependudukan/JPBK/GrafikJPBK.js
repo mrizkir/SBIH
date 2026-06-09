@@ -11,9 +11,11 @@ const GrafikJPBK = (props) => {
   // Filter data untuk menampilkan tahun terakhir saja
   // Jika data memiliki field tahun, kelompokkan berdasarkan tahun dan ambil yang terbaru
   // Jika tidak, asumsikan semua data adalah tahun terakhir
-  const latestYearData = dataJumlahPendudukBerdasarkanKecamatan.length > 0
+  const latestYearData = Array.isArray(dataJumlahPendudukBerdasarkanKecamatan)
+    && dataJumlahPendudukBerdasarkanKecamatan.length > 0
     ? dataJumlahPendudukBerdasarkanKecamatan
     : [];
+  const hasChartData = latestYearData.length > 0;
 
   const dataPresentaseLaki = latestYearData.map(item => parseInt(item.laki))
   const dataPresentasePerempuan = latestYearData.map(item => parseInt(item.perempuan))
@@ -22,22 +24,26 @@ const GrafikJPBK = (props) => {
   const totalLaki = dataPresentaseLaki.reduce((sum, val) => sum + val, 0);
   const totalPerempuan = dataPresentasePerempuan.reduce((sum, val) => sum + val, 0);
   const totalPenduduk = totalLaki + totalPerempuan;
-  const genderRatio = ((totalLaki / totalPerempuan) * 100).toFixed(1);
+  const genderRatio = totalPerempuan > 0
+    ? ((totalLaki / totalPerempuan) * 100).toFixed(1)
+    : '0';
   
-  const maxLaki = Math.max(...dataPresentaseLaki);
-  const maxPerempuan = Math.max(...dataPresentasePerempuan);
-  const minLaki = Math.min(...dataPresentaseLaki);
-  const minPerempuan = Math.min(...dataPresentasePerempuan);
+  const maxLaki = dataPresentaseLaki.length > 0 ? Math.max(...dataPresentaseLaki) : 0;
+  const maxPerempuan = dataPresentasePerempuan.length > 0 ? Math.max(...dataPresentasePerempuan) : 0;
+  const minLaki = dataPresentaseLaki.length > 0 ? Math.min(...dataPresentaseLaki) : 0;
+  const minPerempuan = dataPresentasePerempuan.length > 0 ? Math.min(...dataPresentasePerempuan) : 0;
   
 
   // Cari kecamatan dengan penduduk terbanyak
-  const maxTotalIndex = latestYearData.reduce((maxIdx, item, idx, arr) => {
-    const currentTotal = parseInt(item.laki) + parseInt(item.perempuan);
-    const maxTotal = parseInt(arr[maxIdx].laki) + parseInt(arr[maxIdx].perempuan);
-    return currentTotal > maxTotal ? idx : maxIdx;
-  }, 0);
+  const maxTotalIndex = hasChartData
+    ? latestYearData.reduce((maxIdx, item, idx, arr) => {
+      const currentTotal = parseInt(item.laki) + parseInt(item.perempuan);
+      const maxTotal = parseInt(arr[maxIdx].laki) + parseInt(arr[maxIdx].perempuan);
+      return currentTotal > maxTotal ? idx : maxIdx;
+    }, 0)
+    : 0;
 
-  const kecamatanTerbanyak = latestYearData[maxTotalIndex];
+  const kecamatanTerbanyak = hasChartData ? latestYearData[maxTotalIndex] : null;
 
   return (
     <View style={styles.container}>
@@ -106,6 +112,7 @@ const GrafikJPBK = (props) => {
         </View>
 
         {/* Chart Card */}
+{hasChartData ? (
         <View style={styles.chartCard}>
           <View style={styles.chartHeader}>
             <Icon name="bar-chart" size={24} color="#00acc1" />
@@ -178,29 +185,36 @@ const GrafikJPBK = (props) => {
             />
           </ScrollView>
         </View>
-
+        ) : (
+          <View style={styles.emptyState}>
+            <Icon name="bar-chart-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+          </View>
+        )}
         {/* Highlight Card */}
+        {hasChartData && (
         <View style={styles.highlightCard}>
           <View style={styles.highlightHeader}>
             <Icon name="trophy" size={24} color="#fb8c00" />
             <Text style={styles.highlightTitle}>Kecamatan Terpadat</Text>
           </View>
-          <Text style={styles.highlightDistrict}>{kecamatanTerbanyak.kecamatan}</Text>
+          <Text style={styles.highlightDistrict}>{kecamatanTerbanyak?.kecamatan}</Text>
           <View style={styles.highlightStats}>
             <View style={styles.highlightItem}>
               <Icon name="male" size={20} color="#1e88e5" />
-              <Text style={styles.highlightValue}>{formatNumber(kecamatanTerbanyak.laki)}</Text>
+              <Text style={styles.highlightValue}>{formatNumber(kecamatanTerbanyak?.laki ?? 0)}</Text>
             </View>
             <View style={styles.highlightDivider} />
             <View style={styles.highlightItem}>
               <Icon name="female" size={20} color="#e91e63" />
-              <Text style={styles.highlightValue}>{formatNumber(kecamatanTerbanyak.perempuan)}</Text>
+              <Text style={styles.highlightValue}>{formatNumber(kecamatanTerbanyak?.perempuan ?? 0)}</Text>
             </View>
           </View>
           <Text style={styles.highlightTotal}>
-            Total: {formatNumber(parseInt(kecamatanTerbanyak.laki) + parseInt(kecamatanTerbanyak.perempuan))} jiwa
+            Total: {formatNumber(parseInt(kecamatanTerbanyak?.laki ?? 0) + parseInt(kecamatanTerbanyak?.perempuan ?? 0))} jiwa
           </Text>
         </View>
+        )}
 
         {/* Min-Max Stats */}
         <View style={styles.minMaxCard}>
@@ -313,6 +327,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

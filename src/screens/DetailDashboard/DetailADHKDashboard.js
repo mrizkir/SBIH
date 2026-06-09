@@ -11,7 +11,7 @@ const Tab = createMaterialTopTabNavigator();
 const DetailADHKDashboard = () => {
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Atas Dasar Harga Konstan"

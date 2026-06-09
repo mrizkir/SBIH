@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataIndeksPembangunanGender } from '../../../state/dataIPG'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailIPG = (props) => {
   const {dataIndeksPembangunanGender} = stateDataIndeksPembangunanGender()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getIPGCategory = (total) => {
+    const getIPGCategory = (total) => {
     const value = parseFloat(total);
     if (value >= 95) return { label: 'Sangat Baik', color: '#43a047', icon: 'people' };
     if (value >= 90 && value < 95) return { label: 'Baik', color: '#1e88e5', icon: 'person' };

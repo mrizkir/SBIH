@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataIndeksDayaBeli } from '../../../state/dataIDB'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailIDB = (props) => {
   const {dataIndeksDayaBeli} = stateDataIndeksDayaBeli()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getIDBCategory = (dayaBeli) => {
+    const getIDBCategory = (dayaBeli) => {
     const value = parseFloat(dayaBeli);
     if (value >= 12) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' };
     if (value >= 10 && value < 12) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' };
@@ -68,7 +62,7 @@ const DetailIDB = (props) => {
         <View style={styles.headerTop}>
           <Icon name="wallet" size={32} color="#43a047" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

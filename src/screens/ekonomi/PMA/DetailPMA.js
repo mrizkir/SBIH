@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataPMA } from '../../../state/dataPMA'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -57,14 +57,7 @@ const DetailPMA = (props) => {
     return 'Rp ' + rupiah.split('', rupiah.length - 1).reverse().join('');
   }
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getPMACategory = (jumlah) => {
+    const getPMACategory = (jumlah) => {
     const value = parseFloat(jumlah) || 0;
     if (value >= 1000000000000) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' }; // >= 1T
     if (value >= 500000000000) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' }; // >= 500M
@@ -78,7 +71,7 @@ const DetailPMA = (props) => {
         <View style={styles.headerTop}>
           <Icon name="business" size={32} color="#1565c0" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceDPMPTS}>DPMPTS Kab. Bintan</Text></Text>

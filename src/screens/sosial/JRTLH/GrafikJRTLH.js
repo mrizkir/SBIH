@@ -2,21 +2,17 @@ import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { LineChart } from "react-native-chart-kit";
 import { stateDataJumlahRumahTidakLayakHuni } from '../../../state/dataJRTLH';
-import { color, formatNumber } from '../../../constants/Helper';
+import { color, formatNumber, getLast5YearStats } from '../../../constants/Helper';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const GrafikJRTLH = (props) => {
   const {dataJumlahRumahTidakLayakHuni} = stateDataJumlahRumahTidakLayakHuni()
   
-  // Ambil 5 tahun terakhir
-  const last5Years = dataJumlahRumahTidakLayakHuni.slice(-5);
-  
-  // Hitung statistik dari 5 tahun terakhir
-  const values = last5Years.map(item => parseFloat(item.jumlah_unit));
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
-  const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0);
-  const latestValue = values[values.length - 1];
+  const chartStats = getLast5YearStats(dataJumlahRumahTidakLayakHuni, 'jumlah_unit');
+  const { last5Years, values, hasChartData, maxValue, minValue, latestValue } = chartStats;
+  const avgValue = hasChartData
+    ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0)
+    : '0';
 
 
   // Kategori JRTLH
@@ -37,7 +33,7 @@ const GrafikJRTLH = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#f57c00" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -87,6 +83,7 @@ const GrafikJRTLH = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -126,6 +123,12 @@ const GrafikJRTLH = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Current Value */}
@@ -267,6 +270,18 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

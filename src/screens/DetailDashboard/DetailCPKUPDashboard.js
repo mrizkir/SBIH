@@ -10,7 +10,7 @@ const DetailCPKUPDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Produktivitas Komoditas Unggulan Perkebunan"

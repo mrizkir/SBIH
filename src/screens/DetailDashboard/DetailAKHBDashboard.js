@@ -10,7 +10,7 @@ const Tab = createMaterialTopTabNavigator();
 const DetailAKHBDashboard = () => {
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Angka Keberlangsungan Hidup Bayi"

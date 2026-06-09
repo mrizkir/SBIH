@@ -9,7 +9,7 @@ const Tab = createMaterialTopTabNavigator()
 const DetailRLSDashboard = (props) => {
   return (
     <Tab.Navigator
-    screenOptions={materialTopTabScreenOptions}
+    screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
         <Tab.Screen 
         name="Detail Angka Rata-Rata Lama Sekolah" 

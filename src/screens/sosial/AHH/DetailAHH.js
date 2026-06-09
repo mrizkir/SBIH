@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataAngkaHarapanHidup } from '../../../state/dataAHH'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailAHH = (props) => {
   const {dataAngkaHarapanHidup} = stateDataAngkaHarapanHidup()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getAHHCategory = (ahh) => {
+    const getAHHCategory = (ahh) => {
     const value = parseFloat(ahh);
     if (value >= 75) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'heart' };
     if (value >= 70 && value < 75) return { label: 'Tinggi', color: '#1e88e5', icon: 'heart-half' };
@@ -55,7 +49,7 @@ const DetailAHH = (props) => {
   };
 
   // Sort data by year in descending order (current year to past years)
-  const sortedData = [...(dataAngkaHarapanHidup || [])].sort((a, b) => b.tahun - a.tahun);
+  const sortedData = sortByTahunDesc(dataAngkaHarapanHidup);
 
   return (
     <View style={styles.container}>
@@ -63,7 +57,7 @@ const DetailAHH = (props) => {
         <View style={styles.headerTop}>
           <Icon name="heart" size={32} color="#d32f2f" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

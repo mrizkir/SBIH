@@ -10,7 +10,7 @@ const DetailJRTLHDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Jumlah Rumah Tidak Layak Huni Yang Direhab"

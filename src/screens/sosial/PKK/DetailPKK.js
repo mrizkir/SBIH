@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated, TouchableOpacity, Modal, FlatList } from 'react-native'
 import React, { useRef, useEffect, useState } from 'react'
 import { stateDataPerkembanganKondisiKetenagakerjaan } from '../../../state/dataPKK'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -42,13 +42,7 @@ const DetailPKK = (props) => {
   const [selectedCategory, setSelectedCategory] = useState('Semua Kategori');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getPengangguranCategory = (tingkat) => {
+    const getPengangguranCategory = (tingkat) => {
     const value = parseFloat(tingkat);
     if (value < 3) return { label: 'Sangat Rendah', color: '#43a047' };
     if (value >= 3 && value < 5) return { label: 'Rendah', color: '#1e88e5' };
@@ -96,7 +90,7 @@ const DetailPKK = (props) => {
         <View style={styles.headerTop}>
           <Icon name="briefcase" size={32} color="#00897b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

@@ -5,9 +5,14 @@ import { stateDataJumlahPendudukBerdasarkanKelompokUmur } from '../../../state/d
 import { color, formatNumber } from '../../../constants/Helper';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const GrafikPP = (props) => {
+const GrafikJPBKU = (props) => {
   const { dataJumlahPendudukBerdasarkanKelompokUmur } = stateDataJumlahPendudukBerdasarkanKelompokUmur()
-  const [dataFiltered, setDataFiltered] = React.useState(dataJumlahPendudukBerdasarkanKelompokUmur.filter(item => item.kelompok_umur == 1))
+  const safeData = Array.isArray(dataJumlahPendudukBerdasarkanKelompokUmur)
+    ? dataJumlahPendudukBerdasarkanKelompokUmur
+    : [];
+  const [dataFiltered, setDataFiltered] = React.useState(
+    safeData.filter(item => item.kelompok_umur == 1),
+  )
   const [title, setTitle] = React.useState("0-4 Tahun")
   const [selectedGroup, setSelectedGroup] = React.useState(1)
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -47,6 +52,7 @@ const GrafikPP = (props) => {
 
   // Ambil 5 tahun terakhir
   const last5Years = dataFiltered?.slice(-5) || [];
+  const hasChartData = last5Years.length > 0;
   
   // Hitung statistik dari 5 tahun terakhir
   const values = last5Years.map(item => parseFloat(item.jumlah));
@@ -124,6 +130,12 @@ const GrafikPP = (props) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {!hasChartData && (
+          <View style={styles.emptyState}>
+            <Icon name="bar-chart-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+          </View>
+        )}
         {/* Filter Button */}
         <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.filterButton}>
           <Icon name="filter" size={20} color="#00acc1" />
@@ -327,7 +339,7 @@ const GrafikPP = (props) => {
   )
 }
 
-export default GrafikPP
+export default GrafikJPBKU
 
 const styles = StyleSheet.create({
   container: {

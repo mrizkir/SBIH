@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import { stateDataPS } from '../../../state/dataPS'
 import Icon from 'react-native-vector-icons/Ionicons'
 
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailPS = (props) => {
   const { dataPS } = stateDataPS()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getStuntingCategory = (ps) => {
+    const getStuntingCategory = (ps) => {
     const value = parseFloat(ps);
     if (value < 10) return { label: 'Sangat Rendah', color: '#43a047', icon: 'checkmark-circle' };
     if (value >= 10 && value < 20) return { label: 'Rendah', color: '#1e88e5', icon: 'thumbs-up' };
@@ -64,7 +58,7 @@ const DetailPS = (props) => {
         <View style={styles.headerTop}>
           <Icon name="fitness" size={32} color="#fb8c00" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>EPPGBM</Text></Text>

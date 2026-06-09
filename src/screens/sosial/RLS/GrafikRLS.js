@@ -9,11 +9,12 @@ const GrafikRLS = (props) => {
   const {dataLamaSekolah} = stateDataLamaSekolah()
   
   // Filter data anomali (nilai > 15) dan ambil 5 tahun terakhir
-  const filteredData = dataLamaSekolah.filter(item => parseFloat(item.rls) <= 15);
+  const filteredData = (Array.isArray(dataLamaSekolah) ? dataLamaSekolah : []).filter(item => parseFloat(item.rls) <= 15);
 
   // Urutkan dari terdahulu ke terbaru dan ambil 5 tahun terakhir
-  const sortedAllData = [...filteredData].sort((a, b) => a.tahun - b.tahun);
-  const last5Years = sortedAllData.slice(-5);
+  const sortedAllData = [...(Array.isArray(filteredData) ? filteredData : [])].sort((a, b) => a.tahun - b.tahun);
+  const last5Years = (Array.isArray(sortedAllData) ? sortedAllData : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
 
   // Hitung statistik dari data yang diurutkan
   const values = last5Years.map(item => parseFloat(item.rls));
@@ -37,14 +38,14 @@ const GrafikRLS = (props) => {
   const currentCategory = getRLSCategory(latestValue);
 
   // Handle case when no data is available
-  if (!dataLamaSekolah || dataLamaSekolah.length === 0) {
+  if (!Array.isArray(dataLamaSekolah) || dataLamaSekolah.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <Icon name="analytics" size={32} color="#7b1fa2" />
             <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+              <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
               <View style={styles.sourceContainer}>
                 <Icon name="document-text-outline" size={16} color="#666" />
                 <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -68,7 +69,7 @@ const GrafikRLS = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#7b1fa2" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -118,6 +119,7 @@ const GrafikRLS = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -157,6 +159,12 @@ const GrafikRLS = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Y-Axis Info */}
@@ -291,6 +299,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

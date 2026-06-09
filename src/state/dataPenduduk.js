@@ -1,16 +1,18 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createArrayPersistOptions, createArraySetter } from './persistUtils'
 
 export const stateDataPenduduk = create(
     persist(
         (set, get) => ({
             dataPenduduk: [],
-            setDataPenduduk: (dataFetch) => set({ dataPenduduk: dataFetch }),
+            setDataPenduduk: createArraySetter('dataPenduduk', set),
         }),
         {
             name: 'dataPenduduk', // name of the item in the storage (must be unique)
-            storage: createJSONStorage(() => AsyncStorage), // (optional) by default, 'localStorage' is used
+            storage: createJSONStorage(() => AsyncStorage),
+        ...createArrayPersistOptions('dataPenduduk'),
         },
     ),
 )

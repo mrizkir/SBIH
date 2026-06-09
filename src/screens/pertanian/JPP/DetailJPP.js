@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect, useMemo } from 'react'
 import { stateDataJumlahProduksiPeternakan } from '../../../state/dataJPP'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -37,13 +37,12 @@ const AnimatedCard = ({ children, delay = 0 }) => {
     );
 };
 
-const DetailAHH = (props) => {
+const DetailJPP = (props) => {
   const { dataJumlahProduksiPeternakan } = stateDataJumlahProduksiPeternakan()
 
   // Sort data by year (newest to oldest)
   const sortedData = useMemo(() => {
-    if (!dataJumlahProduksiPeternakan) return [];
-    
+    if (!Array.isArray(dataJumlahProduksiPeternakan)) return [];
     return [...dataJumlahProduksiPeternakan].sort((a, b) => {
       const yearA = parseInt(a.tahun);
       const yearB = parseInt(b.tahun);
@@ -51,14 +50,7 @@ const DetailAHH = (props) => {
     });
   }, [dataJumlahProduksiPeternakan]);
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getProductionCategory = (jumlah) => {
+    const getProductionCategory = (jumlah) => {
     const value = parseFloat(jumlah);
     if (value >= 7000) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' };
     if (value >= 5500 && value < 7000) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' };
@@ -73,7 +65,7 @@ const DetailAHH = (props) => {
         <View style={styles.headerTop}>
           <Icon name="stats-chart" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceDinas}>Dinas Ketahanan Pangan dan Pertanian Kab. Bintan</Text></Text>
@@ -256,7 +248,7 @@ const DetailAHH = (props) => {
   )
 }
 
-export default DetailAHH
+export default DetailJPP
 
 const styles = StyleSheet.create({
   container: {

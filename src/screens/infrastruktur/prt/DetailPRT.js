@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataPenggunaanAirBersih } from '../../../state/dataPRT'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -48,15 +48,7 @@ const DetailPRT = (props) => {
       return yearB - yearA; // Descending order (terbaru ke terlama)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getUsageCategory = (nilai) => {
+    const getUsageCategory = (nilai) => {
     const value = parseFloat(nilai) || 0;
     if (value >= 80) return { label: 'Sangat Baik', color: '#43a047', icon: 'water' };
     if (value >= 60 && value < 80) return { label: 'Baik', color: '#1e88e5', icon: 'water-outline' };
@@ -75,7 +67,7 @@ const DetailPRT = (props) => {
         <View style={styles.headerTop}>
           <Icon name="water" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

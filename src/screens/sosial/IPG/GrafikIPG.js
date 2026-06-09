@@ -9,20 +9,27 @@ const GrafikIPG = (props) => {
   const {dataIndeksPembangunanGender} = stateDataIndeksPembangunanGender()
   
   // Ambil 5 tahun terakhir
-  const last5Years = dataIndeksPembangunanGender.slice(-5);
+  const last5Years = (Array.isArray(dataIndeksPembangunanGender) ? dataIndeksPembangunanGender : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
   
   const dataLaki = last5Years.map(item => parseFloat(item.laki));
   const dataPerempuan = last5Years.map(item => parseFloat(item.perempuan));
   const dataTotal = last5Years.map(item => parseFloat(item.total));
 
   // Statistik
-  const avgLaki = (dataLaki.reduce((a, b) => a + b, 0) / dataLaki.length).toFixed(2);
-  const avgPerempuan = (dataPerempuan.reduce((a, b) => a + b, 0) / dataPerempuan.length).toFixed(2);
-  const avgTotal = (dataTotal.reduce((a, b) => a + b, 0) / dataTotal.length).toFixed(2);
-  const latestTotal = dataTotal[dataTotal.length - 1];
+  const avgLaki = hasChartData
+    ? (dataLaki.reduce((a, b) => a + b, 0) / dataLaki.length).toFixed(2)
+    : '0';
+  const avgPerempuan = hasChartData
+    ? (dataPerempuan.reduce((a, b) => a + b, 0) / dataPerempuan.length).toFixed(2)
+    : '0';
+  const avgTotal = hasChartData
+    ? (dataTotal.reduce((a, b) => a + b, 0) / dataTotal.length).toFixed(2)
+    : '0';
+  const latestTotal = hasChartData ? dataTotal[dataTotal.length - 1] : 0;
 
   // Gap Gender
-  const genderGap = Math.abs(avgLaki - avgPerempuan).toFixed(2);
+  const genderGap = hasChartData ? Math.abs(avgLaki - avgPerempuan).toFixed(2) : '0';
 
   return (
     <View style={styles.container}>
@@ -31,7 +38,7 @@ const GrafikIPG = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#9c27b0" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -100,6 +107,7 @@ const GrafikIPG = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -147,6 +155,12 @@ const GrafikIPG = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Custom Legend */}
@@ -253,6 +267,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

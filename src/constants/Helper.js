@@ -40,3 +40,46 @@ export const formatNumberWithDecimals = (num, decimals = 2) => {
     const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return `${integerPart},${parts[1]}`;
 };
+
+export const normalizeArrayData = (data) => (Array.isArray(data) ? data : []);
+
+export const getStatusColor = (status) => {
+    const s = (status ?? '').toString().toLowerCase();
+    if (s.includes('tetap')) return '#43a047';
+    if (s.includes('sementara')) return '#fb8c00';
+    if (s.includes('estimasi')) return '#1e88e5';
+    return '#666';
+};
+
+export const sortByTahunDesc = (data) => {
+    if (!Array.isArray(data)) return [];
+    return [...data].sort(
+        (a, b) => (parseInt(b.tahun, 10) || 0) - (parseInt(a.tahun, 10) || 0),
+    );
+};
+
+export const getLast5YearStats = (data, valueKey = 'jumlah') => {
+    const items = normalizeArrayData(data);
+    const last5Years = items.slice(-5);
+    if (last5Years.length === 0) {
+        return {
+            last5Years: [],
+            values: [],
+            hasChartData: false,
+            maxValue: 0,
+            minValue: 0,
+            avgValue: '0',
+            latestValue: 0,
+        };
+    }
+    const values = last5Years.map((item) => parseFloat(item[valueKey]) || 0);
+    return {
+        last5Years,
+        values,
+        hasChartData: true,
+        maxValue: Math.max(...values),
+        minValue: Math.min(...values),
+        avgValue: (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0),
+        latestValue: values[values.length - 1],
+    };
+};

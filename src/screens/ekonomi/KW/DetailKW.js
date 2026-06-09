@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataKunjunganWisata } from '../../../state/dataKW'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -48,14 +48,7 @@ const DetailKW = (props) => {
       return yearB - yearA; // Descending order (terbaru ke terlama)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getKWCategory = (jumlah) => {
+    const getKWCategory = (jumlah) => {
     const value = parseInt(jumlah);
     if (value >= 100000) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' };
     if (value >= 50000 && value < 100000) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' };
@@ -70,7 +63,7 @@ const DetailKW = (props) => {
         <View style={styles.headerTop}>
           <Icon name="airplane" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

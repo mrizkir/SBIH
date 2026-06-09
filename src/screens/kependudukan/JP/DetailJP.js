@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import {stateDataJumlahPenduduk} from '../../../state/dataJP'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -37,7 +37,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
     );
 };
 
-const DetailPP = (props) => {
+const DetailJP = (props) => {
   const { dataJumlahPenduduk } = stateDataJumlahPenduduk()
 
   // Sort data dari tahun terbaru ke terlama
@@ -48,14 +48,7 @@ const DetailPP = (props) => {
       return yearB - yearA; // Descending order (terbaru ke terlama)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-
+  
   const calculatePercentage = (laki, perempuan) => {
     const lakiNum = parseInt(laki) || 0;
     const perempuanNum = parseInt(perempuan) || 0;
@@ -74,7 +67,7 @@ const DetailPP = (props) => {
         <View style={styles.headerTop}>
           <Icon name="people-circle" size={32} color="#3949ab" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -185,7 +178,7 @@ const DetailPP = (props) => {
   )
 }
 
-export default DetailPP
+export default DetailJP
 
 const styles = StyleSheet.create({
   container: {

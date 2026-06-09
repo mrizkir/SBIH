@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataJumlahRumahTidakLayakHuni } from '../../../state/dataJRTLH'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailJRTLH = (props) => {
   const {dataJumlahRumahTidakLayakHuni} = stateDataJumlahRumahTidakLayakHuni()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getJRTLHCategory = (jumlah) => {
+    const getJRTLHCategory = (jumlah) => {
     const value = parseInt(jumlah);
     if (value === 0) return { label: 'Sangat Baik', color: '#43a047', icon: 'home' };
     if (value >= 1 && value <= 100) return { label: 'Baik', color: '#1e88e5', icon: 'business' };
@@ -65,7 +59,7 @@ const DetailJRTLH = (props) => {
         <View style={styles.headerTop}>
           <Icon name="home" size={32} color="#f57c00" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

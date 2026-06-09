@@ -10,7 +10,7 @@ const DetailCPKHDashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Capaian Produksi Komoditi Hortikultura "

@@ -9,7 +9,7 @@ const Tab = createMaterialTopTabNavigator()
 const DetailDashboard = (props) => {
   return (
     <Tab.Navigator
-    screenOptions={materialTopTabScreenOptions}
+    screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
         <Tab.Screen 
         name="Detail Indeks Pembangunan Manusia" 

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataPersentaseTingkatKemantapanJalan } from '../../../state/dataPTKJ'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -48,15 +48,7 @@ const DetailPTKJ = (props) => {
       return yearB - yearA; // Descending order (terbaru ke terlama)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getRoadConditionCategory = (kemantapan) => {
+    const getRoadConditionCategory = (kemantapan) => {
     const value = parseFloat(kemantapan) || 0;
     if (value >= 80) return { label: 'Sangat Mantap', color: '#43a047', icon: 'checkmark-circle' };
     if (value >= 60 && value < 80) return { label: 'Mantap', color: '#1e88e5', icon: 'checkmark' };
@@ -75,7 +67,7 @@ const DetailPTKJ = (props) => {
         <View style={styles.headerTop}>
           <Icon name="construct" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <Text style={styles.sourceText}>
               Data Persentase Tingkat Kemantapan Jalan (PTKJ).
             </Text>

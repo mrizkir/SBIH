@@ -10,7 +10,7 @@ const DetailPMADashboard = (props) => {
 
   return (
     <Tab.Navigator
-      screenOptions={materialTopTabScreenOptions}
+      screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
         name="Detail Realisasi Investasi (PMA / PMDN)"

@@ -27,12 +27,12 @@ const GrafikADHB = (props) => {
         }
 
         // Ambil 5 tahun terakhir
-        const last5Years = filteredData.slice(-5);
+        const last5Years = (Array.isArray(filteredData) ? filteredData : []).slice(-5);
         const values = last5Years.map(item => parseFloat(item.jumlah));
-        const maxValue = Math.max(...values);
-        const minValue = Math.min(...values);
+        const maxValue = values.length > 0 ? Math.max(...values) : 0;
+        const minValue = values.length > 0 ? Math.min(...values) : 0;
         const avgValue = (values.reduce((a, b) => a + b, 0) / values.length);
-        const latestValue = values[values.length - 1];
+        const latestValue = values.length > 0 ? values[values.length - 1] : 0;
 
         return {
             last5Years,
@@ -75,7 +75,7 @@ const GrafikADHB = (props) => {
                 <View style={styles.headerTop}>
                     <Icon name="analytics" size={32} color="#2e7d32" />
                     <View style={styles.headerTextContainer}>
-                        <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+                        <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
                         <View style={styles.sourceContainer}>
                             <Icon name="document-text-outline" size={16} color="#666" />
                             <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

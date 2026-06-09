@@ -2,21 +2,17 @@ import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { LineChart } from "react-native-chart-kit";
 import { stateDataPerkembanganKondisiKetenagakerjaan } from '../../../state/dataPKK';
-import { color } from '../../../constants/Helper';
+import { color, getLast5YearStats } from '../../../constants/Helper';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const GrafikPKK = (props) => {
   const {dataPerkembanganKondisiKetenagakerjaan} = stateDataPerkembanganKondisiKetenagakerjaan()
   
-  // Ambil 5 tahun terakhir
-  const last5Years = dataPerkembanganKondisiKetenagakerjaan.slice(-5);
-  
-  // Hitung statistik dari 5 tahun terakhir
-  const values = last5Years.map(item => parseFloat(item.tingkat_pengangguran));
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
-  const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
-  const latestValue = values[values.length - 1];
+  const chartStats = getLast5YearStats(dataPerkembanganKondisiKetenagakerjaan, 'tingkat_pengangguran');
+  const { last5Years, values, hasChartData, maxValue, minValue, latestValue } = chartStats;
+  const avgValue = hasChartData
+    ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)
+    : '0.00';
 
   // Tentukan range untuk sumbu Y (0 sampai max + buffer)
   const yAxisMax = Math.ceil(maxValue) + 1;
@@ -39,7 +35,7 @@ const GrafikPKK = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#00897b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -89,6 +85,7 @@ const GrafikPKK = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -129,6 +126,12 @@ const GrafikPKK = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Y-Axis Info */}
@@ -253,6 +256,18 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

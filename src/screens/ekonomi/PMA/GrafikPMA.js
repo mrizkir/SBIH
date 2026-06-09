@@ -2,21 +2,20 @@ import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { LineChart } from "react-native-chart-kit";
 import { stateDataPMA } from '../../../state/dataPMA';
-import { color } from '../../../constants/Helper';
+import { color, getLast5YearStats } from '../../../constants/Helper';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const GrafikPMA = (props) => {
   const { dataPMA } = stateDataPMA()
   
-  // Ambil 5 tahun terakhir dan urutkan dari tahun terendah ke tahun sekarang
-  const last5Years = [...dataPMA].sort((a, b) => a.tahun - b.tahun).slice(-5);
-  
-  // Hitung statistik dari 5 tahun terakhir
-  const values = last5Years.map(item => parseFloat(item.jumlah));
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
-  const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0);
-  const latestValue = values[values.length - 1];
+  const sortedPMA = Array.isArray(dataPMA)
+    ? [...dataPMA].sort((a, b) => a.tahun - b.tahun)
+    : [];
+  const chartStats = getLast5YearStats(sortedPMA, 'jumlah');
+  const { last5Years, values, hasChartData, maxValue, minValue, latestValue } = chartStats;
+  const avgValue = hasChartData
+    ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(0)
+    : '0';
 
   // Tentukan range untuk sumbu Y (mulai dari 0)
   const yAxisMin = 0;
@@ -52,7 +51,7 @@ const GrafikPMA = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#1565c0" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceDPMPTS}>DPMPTS Kab. Bintan</Text></Text>
@@ -102,6 +101,7 @@ const GrafikPMA = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -141,6 +141,12 @@ const GrafikPMA = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Y-Axis Info */}
@@ -292,6 +298,18 @@ const styles = StyleSheet.create({
   sourceDPMPTS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

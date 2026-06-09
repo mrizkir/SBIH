@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataProduksiPerikananTangkap } from '../../../state/dataPPT'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailPPT = (props) => {
   const {dataProduksiPerikananTangkap} = stateDataProduksiPerikananTangkap()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getPPTCategory = (jumlah) => {
+    const getPPTCategory = (jumlah) => {
     const value = parseFloat(jumlah);
     if (value >= 10000) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' };
     if (value >= 5000 && value < 10000) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' };
@@ -56,7 +50,7 @@ const DetailPPT = (props) => {
 
 
   // Sort data by year in descending order (current year to past years)
-  const sortedData = [...(dataProduksiPerikananTangkap || [])].sort((a, b) => b.tahun - a.tahun);
+  const sortedData = sortByTahunDesc(dataProduksiPerikananTangkap);
 
   return (
     <View style={styles.container}>
@@ -64,7 +58,7 @@ const DetailPPT = (props) => {
         <View style={styles.headerTop}>
           <Icon name="boat" size={32} color="#01579b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceDinas}>Dinas Perikanan Kab. Bintan</Text></Text>

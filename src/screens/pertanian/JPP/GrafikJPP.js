@@ -5,11 +5,14 @@ import { stateDataJumlahProduksiPeternakan } from '../../../state/dataJPP';
 import { color, formatNumber } from '../../../constants/Helper';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const GrafikAHH = (props) => {
+const GrafikJPP = (props) => {
   const { dataJumlahProduksiPeternakan } = stateDataJumlahProduksiPeternakan()
   
   // Ambil 5 tahun terakhir
-  const last5Years = dataJumlahProduksiPeternakan?.slice(-5) || [];
+  const last5Years = (Array.isArray(dataJumlahProduksiPeternakan)
+    ? dataJumlahProduksiPeternakan
+    : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
   
   // Hitung statistik dari 5 tahun terakhir
   const values = last5Years.map(item => parseFloat(item.jumlah));
@@ -50,6 +53,12 @@ const GrafikAHH = (props) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {!hasChartData && (
+          <View style={styles.emptyState}>
+            <Icon name="bar-chart-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+          </View>
+        )}
         {/* Period Info */}
         {last5Years.length > 0 && (
           <View style={styles.periodCard}>
@@ -213,7 +222,7 @@ const GrafikAHH = (props) => {
   )
 }
 
-export default GrafikAHH
+export default GrafikJPP
 
 const styles = StyleSheet.create({
   container: {

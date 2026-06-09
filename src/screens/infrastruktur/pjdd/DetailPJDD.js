@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataPanjangJalanDibangun } from '../../../state/dataPJD'
-import { color, formatNumber, formatNumberWithDecimals } from '../../../constants/Helper'
+import { color, formatNumber, formatNumberWithDecimals, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -48,15 +48,7 @@ const DetailPJDD = (props) => {
       return yearB - yearA; // Descending order (terbaru ke terlama)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getRoadCategory = (panjang) => {
+    const getRoadCategory = (panjang) => {
     const value = parseFloat(panjang) || 0;
     if (value >= 10) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' };
     if (value >= 5 && value < 10) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' };
@@ -76,7 +68,7 @@ const DetailPJDD = (props) => {
         <View style={styles.headerTop}>
           <Icon name="git-network" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <Text style={styles.sourceText}>
               Panjang jalan yang dibangun dan ditingkat.
             </Text>

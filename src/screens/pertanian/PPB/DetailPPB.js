@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useMemo } from 'react'
 import { stateDataProduksiPerikananBudidaya } from '../../../state/dataPPB'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailPPB = (props) => {
   const {dataProduksiPerikananBudidaya} = stateDataProduksiPerikananBudidaya()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getPPBCategory = (jumlah) => {
+    const getPPBCategory = (jumlah) => {
     const value = parseFloat(jumlah);
     if (value >= 10000) return { label: 'Sangat Tinggi', color: '#43a047', icon: 'trending-up' };
     if (value >= 5000 && value < 10000) return { label: 'Tinggi', color: '#1e88e5', icon: 'arrow-up' };
@@ -55,16 +49,22 @@ const DetailPPB = (props) => {
   };
 
 
-  // Sort data by year in descending order (current year to past years)
-  const sortedData = [...(dataProduksiPerikananBudidaya || [])].sort((a, b) => b.tahun - a.tahun);
+  const sortedData = useMemo(() => {
+    if (!Array.isArray(dataProduksiPerikananBudidaya)) return [];
+    return [...dataProduksiPerikananBudidaya].sort(
+      (a, b) => (parseInt(b.tahun, 10) || 0) - (parseInt(a.tahun, 10) || 0),
+    );
+  }, [dataProduksiPerikananBudidaya]);
+
+  const title = props.route.params?.title ?? 'Data Produksi Perikanan Budidaya (Ton)';
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Icon name="fish" size={32} color="#00796b" />
+          <Icon name="fish-outline" size={32} color="#00796b" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{title}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceDinas}>Dinas Perikanan Kab. Bintan</Text></Text>

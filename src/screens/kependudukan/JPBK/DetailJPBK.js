@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated, TouchableOpacity, Modal, FlatList } from 'react-native'
 import React, { useRef, useEffect, useState } from 'react'
 import { stateDataJumlahPendudukBerdasarkanKecamatan } from '../../../state/dataJBPK'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -37,7 +37,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
     );
 };
 
-const DetailPP = (props) => {
+const DetailJPBK = (props) => {
   const { dataJumlahPendudukBerdasarkanKecamatan } = stateDataJumlahPendudukBerdasarkanKecamatan()
   const [selectedYear, setSelectedYear] = useState('Semua Tahun');
   const [modalVisible, setModalVisible] = useState(false);
@@ -78,15 +78,7 @@ const DetailPP = (props) => {
       return totalB - totalA; // Descending order (tertinggi ke terendah)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getPopulationCategory = (total) => {
+    const getPopulationCategory = (total) => {
     const value = parseInt(total) || 0;
     if (value >= 15000) return { label: 'Sangat Padat', color: '#e53935', icon: 'people' };
     if (value >= 10000 && value < 15000) return { label: 'Padat', color: '#fb8c00', icon: 'people-circle' };
@@ -114,7 +106,7 @@ const DetailPP = (props) => {
         <View style={styles.headerTop}>
           <Icon name="map" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -359,7 +351,7 @@ const DetailPP = (props) => {
   )
 }
 
-export default DetailPP
+export default DetailJPBK
 
 const styles = StyleSheet.create({
   container: {

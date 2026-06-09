@@ -9,8 +9,9 @@ const GrafikMasyMiskin = (props) => {
   const {dataPenduduk} = stateDataPenduduk()
   
   // Ambil 5 tahun terakhir dan urutkan dari terdahulu ke terbaru
-  const sortedAllData = [...dataPenduduk].sort((a, b) => a.tahun - b.tahun);
-  const last5Years = sortedAllData.slice(-5);
+  const sortedAllData = [...(Array.isArray(dataPenduduk) ? dataPenduduk : [])].sort((a, b) => a.tahun - b.tahun);
+  const last5Years = (Array.isArray(sortedAllData) ? sortedAllData : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
 
   // Hitung statistik dari data yang diurutkan
   const values = last5Years.map(item => parseFloat(item.presentase));
@@ -34,14 +35,14 @@ const GrafikMasyMiskin = (props) => {
   const currentCategory = getKemiskinanCategory(latestValue);
 
   // Handle case when no data is available
-  if (!dataPenduduk || dataPenduduk.length === 0) {
+  if (!Array.isArray(dataPenduduk) || dataPenduduk.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <Icon name="analytics" size={32} color="#e53935" />
             <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+              <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
               <Text style={styles.sourceText}>
                 Data Persentase Tingkat Kemiskinan.
               </Text>
@@ -70,7 +71,7 @@ const GrafikMasyMiskin = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#e53935" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <Text style={styles.sourceText}>
               Data Persentase Tingkat Kemiskinan.
             </Text>
@@ -125,6 +126,7 @@ const GrafikMasyMiskin = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -165,6 +167,12 @@ const GrafikMasyMiskin = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Y-Axis Info */}
@@ -293,6 +301,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

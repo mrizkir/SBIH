@@ -40,7 +40,7 @@ const GrafikPPU = (props) => {
 
   // Sort data by year in ascending order for chart
   const sortedData = useMemo(() => {
-    if (!dataPersentasePendudukUsia || dataPersentasePendudukUsia.length === 0) return [];
+    if (!Array.isArray(dataPersentasePendudukUsia) || dataPersentasePendudukUsia.length === 0) return [];
     return [...dataPersentasePendudukUsia].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
   }, [dataPersentasePendudukUsia]);
 

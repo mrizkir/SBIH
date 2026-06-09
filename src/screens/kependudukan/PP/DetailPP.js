@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataPertumbuhanPenduduk } from '../../../state/dataPP'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -48,15 +48,7 @@ const DetailPP = (props) => {
       return yearB - yearA; // Descending order (terbaru ke terlama)
     }) || [];
 
-  const getStatusColor = (status) => {
-    if (!status) return '#666';
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    if (status.toLowerCase().includes('estimasi')) return '#1e88e5';
-    return '#666';
-  };
-
-  const getGrowthCategory = (laju) => {
+    const getGrowthCategory = (laju) => {
     const value = parseFloat(laju) || 0;
     if (value >= 3.0) return { label: 'Sangat Tinggi', color: '#e53935', icon: 'trending-up' };
     if (value >= 2.0 && value < 3.0) return { label: 'Tinggi', color: '#fb8c00', icon: 'arrow-up' };
@@ -77,7 +69,7 @@ const DetailPP = (props) => {
         <View style={styles.headerTop}>
           <Icon name="people" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

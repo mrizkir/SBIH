@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect, useMemo } from 'react'
 import { stateDataCapaianProduksiKomoditiHortikultura } from '../../../state/dataCPKH'
-import { color, formatNumber } from '../../../constants/Helper'
+import { color, formatNumber, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -42,8 +42,7 @@ const DetailCPKH = (props) => {
 
   // Sort data by year (newest to oldest)
   const sortedData = useMemo(() => {
-    if (!dataCapaianProduksiKomoditiHortikultura) return [];
-    
+    if (!Array.isArray(dataCapaianProduksiKomoditiHortikultura)) return [];
     return [...dataCapaianProduksiKomoditiHortikultura].sort((a, b) => {
       const yearA = parseInt(a.tahun);
       const yearB = parseInt(b.tahun);
@@ -51,13 +50,7 @@ const DetailCPKH = (props) => {
     });
   }, [dataCapaianProduksiKomoditiHortikultura]);
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getCPKHCategory = (jumlah) => {
+    const getCPKHCategory = (jumlah) => {
     const value = parseFloat(jumlah);
     if (value >= 100) return { label: 'Sangat Produktif', color: '#43a047', icon: 'trending-up' };
     if (value >= 50 && value < 100) return { label: 'Produktif', color: '#1e88e5', icon: 'arrow-up' };
@@ -72,7 +65,7 @@ const DetailCPKH = (props) => {
         <View style={styles.headerTop}>
           <Icon name="nutrition" size={32} color="#7b1fa2" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

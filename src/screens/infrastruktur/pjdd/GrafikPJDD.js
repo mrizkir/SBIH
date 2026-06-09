@@ -10,7 +10,8 @@ const GrafikPJDD = (props) => {
   
   // Urutkan data berdasarkan tahun dari terlama hingga sekarang, lalu ambil 5 tahun terakhir
   const sortedData = [...(dataPanjangJalanDibangun || [])].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
-  const last5Years = sortedData.slice(-5);
+  const last5Years = (Array.isArray(sortedData) ? sortedData : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
   
   // Hitung statistik dari 5 tahun terakhir
   const values = last5Years.map(item => parseFloat(item.panjang));
@@ -40,7 +41,7 @@ const GrafikPJDD = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#00acc1" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <Text style={styles.sourceText}>
               Panjang jalan yang dibangun dan ditingkat.
             </Text>
@@ -58,6 +59,12 @@ const GrafikPJDD = (props) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {!hasChartData && (
+          <View style={styles.emptyState}>
+            <Icon name="bar-chart-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+          </View>
+        )}
         {/* Period Info */}
         {last5Years.length > 0 && (
           <View style={styles.periodCard}>

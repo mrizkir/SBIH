@@ -8,8 +8,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const GrafikPS = (props) => {
   const { dataPS } = stateDataPS()
 
-  const sortedAllData = [...(dataPS || [])].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
-  const last5Years = sortedAllData.slice(-5);
+  const sortedAllData = [...(Array.isArray(dataPS) ? dataPS : [])].sort((a, b) => parseInt(a.tahun) - parseInt(b.tahun));
+  const last5Years = (Array.isArray(sortedAllData) ? sortedAllData : []).slice(-5);
+  const hasChartData = last5Years.length > 0;
 
   const values = last5Years.map(item => parseFloat(item.prevalensi));
   const maxValue = values.length > 0 ? Math.max(...values) : 0;
@@ -36,7 +37,7 @@ const GrafikPS = (props) => {
           <View style={styles.headerTop}>
             <Icon name="analytics" size={32} color="#fb8c00" />
             <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+              <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
               <View style={styles.sourceContainer}>
                 <Icon name="document-text-outline" size={16} color="#666" />
                 <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -60,7 +61,7 @@ const GrafikPS = (props) => {
         <View style={styles.headerTop}>
           <Icon name="analytics" size={32} color="#fb8c00" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>
@@ -110,6 +111,7 @@ const GrafikPS = (props) => {
           </View>
           
           <View style={styles.chartWrapper}>
+{hasChartData ? (
             <LineChart
               data={{
                 labels: last5Years.map(item => item.tahun),
@@ -150,6 +152,12 @@ const GrafikPS = (props) => {
               bezier
               style={styles.chart}
             />
+            ) : (
+              <View style={styles.emptyState}>
+                <Icon name="bar-chart-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Belum ada data tersedia untuk grafik</Text>
+              </View>
+            )}
           </View>
 
           {/* Y-Axis Info */}
@@ -274,6 +282,17 @@ const styles = StyleSheet.create({
   sourceBPS: {
     color: '#e53935',
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   scrollContent: {
     padding: 16,

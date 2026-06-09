@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
 import React, { useRef, useEffect } from 'react'
 import { stateDataIndeksPemberdayaanGender } from '../../../state/dataIPGG'
-import { color } from '../../../constants/Helper'
+import { color, getStatusColor, sortByTahunDesc } from '../../../constants/Helper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -40,13 +40,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 const DetailIPGG = (props) => {
   const {dataIndeksPemberdayaanGender} = stateDataIndeksPemberdayaanGender()
 
-  const getStatusColor = (status) => {
-    if (status.toLowerCase().includes('tetap')) return '#43a047';
-    if (status.toLowerCase().includes('sementara')) return '#fb8c00';
-    return '#666';
-  };
-
-  const getIPGGCategory = (idg) => {
+    const getIPGGCategory = (idg) => {
     const value = parseFloat(idg);
     if (value >= 80) return { label: 'Sangat Baik', color: '#43a047', icon: 'people' };
     if (value >= 70 && value < 80) return { label: 'Baik', color: '#1e88e5', icon: 'person' };
@@ -64,7 +58,7 @@ const DetailIPGG = (props) => {
         <View style={styles.headerTop}>
           <Icon name="trophy" size={32} color="#7b1fa2" />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{props.route.params.title}</Text>
+            <Text style={styles.headerTitle}>{props.route.params?.title ?? ""}</Text>
             <View style={styles.sourceContainer}>
               <Icon name="document-text-outline" size={16} color="#666" />
               <Text style={styles.sourceText}>Sumber: <Text style={styles.sourceBPS}>BPS</Text></Text>

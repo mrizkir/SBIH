@@ -152,10 +152,7 @@ const DashboardAnggaranMurni = ({ navigation }) => {
             {error && <Text style={{ color: 'red', padding: 10 }}>Error: {error.message}</Text>}
             
             <Tab.Navigator
-                screenOptions={{
-                    ...materialTopTabScreenOptions,
-                    tabBarScrollEnabled: true,
-                }}
+                screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
             >
                 <Tab.Screen
                     name="Anggaran Murni"
