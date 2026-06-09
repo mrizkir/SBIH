@@ -13,14 +13,14 @@ const DetailPMADashboard = (props) => {
       screenOptions={{ ...materialTopTabScreenOptions, lazy: true }}
     >
       <Tab.Screen
-        name="Detail Realisasi Investasi (PMA / PMDN)"
+        name="Detail Realisasi Investasi)"
         component={DetailPMA}
-        initialParams={{ title: "Data Realisasi Investasi (PMA / PMDN)" }}
+        initialParams={{ title: "Data Realisasi Investasi" }}
       />
       <Tab.Screen
-        name="Grafik Realisasi Investasi (PMA / PMDN)"
+        name="Grafik Realisasi Investasi"
         component={GrafikPMA}
-        initialParams={{ title: "Data Realisasi Investasi (PMA / PMDN)" }}
+        initialParams={{ title: "Data Realisasi Investasi" }}
       />
     </Tab.Navigator>
   )
